@@ -25,8 +25,8 @@ const ContactSection = () => {
               <div className="w-14 h-14 bg-primary/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Phone className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="font-bold mb-2">اتصل بنا</h3>
-              <p className="text-muted-foreground text-sm">+966 XX XXX XXXX</p>
+              <h3 className="font-bold mb-2"> موقعنا على تلقرام</h3>
+              <p className="text-muted-foreground text-sm">https://t.me/+2uEtg05UmVc0Yjk0</p>
             </div>
 
             <div className="bg-card border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-300">
