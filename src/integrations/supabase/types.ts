@@ -14,16 +14,213 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      comments: {
+        Row: {
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          is_approved: boolean | null
+          location: string | null
+          rating: number | null
+        }
+        Insert: {
+          author_name: string
+          content: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean | null
+          location?: string | null
+          rating?: number | null
+        }
+        Update: {
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean | null
+          location?: string | null
+          rating?: number | null
+        }
+        Relationships: []
+      }
+      packages: {
+        Row: {
+          created_at: string
+          daily_profit: number
+          description: string | null
+          id: string
+          image_url: string | null
+          investment_amount: number
+          investment_period_days: number | null
+          is_active: boolean | null
+          is_business: boolean | null
+          is_featured: boolean | null
+          name: string | null
+          package_number: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          daily_profit: number
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          investment_amount: number
+          investment_period_days?: number | null
+          is_active?: boolean | null
+          is_business?: boolean | null
+          is_featured?: boolean | null
+          name?: string | null
+          package_number: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          daily_profit?: number
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          investment_amount?: number
+          investment_period_days?: number | null
+          is_active?: boolean | null
+          is_business?: boolean | null
+          is_featured?: boolean | null
+          name?: string | null
+          package_number?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payment_methods: {
+        Row: {
+          account_holder_name: string | null
+          account_number: string | null
+          bank_name: string | null
+          created_at: string
+          iban: string | null
+          id: string
+          is_active: boolean | null
+          method_type: string
+          telegram_link: string | null
+          updated_at: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          account_holder_name?: string | null
+          account_number?: string | null
+          bank_name?: string | null
+          created_at?: string
+          iban?: string | null
+          id?: string
+          is_active?: boolean | null
+          method_type: string
+          telegram_link?: string | null
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          account_holder_name?: string | null
+          account_number?: string | null
+          bank_name?: string | null
+          created_at?: string
+          iban?: string | null
+          id?: string
+          is_active?: boolean | null
+          method_type?: string
+          telegram_link?: string | null
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +347,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
