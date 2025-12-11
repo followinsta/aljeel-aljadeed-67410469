@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Menu, X, TrendingUp } from "lucide-react";
+import { Menu, X, TrendingUp, LogIn, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut, isAdmin } = useAuth();
 
   const navLinks = [
     { href: "#home", label: "الرئيسية" },
@@ -12,6 +15,10 @@ const Header = () => {
     { href: "#about", label: "من نحن" },
     { href: "#contact", label: "تواصل معنا" },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -41,9 +48,31 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* CTA */}
-          <div className="hidden md:block">
-            <Button variant="gold">ابدأ الاستثمار</Button>
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <User className="w-4 h-4" />
+                      لوحة التحكم
+                    </Button>
+                  </Link>
+                )}
+                <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-2">
+                  <LogOut className="w-4 h-4" />
+                  خروج
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button variant="gold" className="gap-2">
+                  <LogIn className="w-4 h-4" />
+                  تسجيل الدخول
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -70,9 +99,29 @@ const Header = () => {
                 {link.label}
               </a>
             ))}
-            <Button variant="gold" className="mt-4">
-              ابدأ الاستثمار
-            </Button>
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full gap-2">
+                      <User className="w-4 h-4" />
+                      لوحة التحكم
+                    </Button>
+                  </Link>
+                )}
+                <Button variant="ghost" onClick={handleSignOut} className="w-full gap-2 mt-2">
+                  <LogOut className="w-4 h-4" />
+                  تسجيل الخروج
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="gold" className="w-full mt-4 gap-2">
+                  <LogIn className="w-4 h-4" />
+                  تسجيل الدخول
+                </Button>
+              </Link>
+            )}
           </nav>
         </div>
       )}
