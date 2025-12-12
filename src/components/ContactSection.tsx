@@ -1,7 +1,19 @@
 import { Button } from "./ui/button";
-import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
+import { Phone, MapPin, MessageCircle, Send } from "lucide-react";
+
+const TELEGRAM_LINK = "https://t.me/+2uEtg05UmVc0Yjk0";
+const WHATSAPP_NUMBER = "966545189624";
 
 const ContactSection = () => {
+  const handleTelegramClick = () => {
+    window.open(TELEGRAM_LINK, "_blank", "noopener,noreferrer");
+  };
+
+  const handleWhatsAppClick = () => {
+    const message = encodeURIComponent("مرحباً، أريد الاستفسار عن باقات الاستثمار");
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <section id="contact" className="py-24 bg-gradient-hero relative">
       {/* Background decoration */}
@@ -21,21 +33,27 @@ const ContactSection = () => {
 
           {/* Contact methods */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-card border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-300">
+            <button
+              onClick={handleTelegramClick}
+              className="bg-card border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-300 cursor-pointer text-center"
+            >
               <div className="w-14 h-14 bg-primary/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-7 h-7 text-primary" />
+                <Send className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="font-bold mb-2"> موقعنا على تلقرام</h3>
-              <p className="text-muted-foreground text-sm">https://t.me/+2uEtg05UmVc0Yjk0</p>
-            </div>
+              <h3 className="font-bold mb-2">موقعنا على تلقرام</h3>
+              <p className="text-muted-foreground text-sm">اضغط للدخول للقناة</p>
+            </button>
 
-            <div className="bg-card border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-300">
+            <button
+              onClick={handleWhatsAppClick}
+              className="bg-card border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-300 cursor-pointer text-center"
+            >
               <div className="w-14 h-14 bg-accent/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <MessageCircle className="w-7 h-7 text-accent" />
               </div>
               <h3 className="font-bold mb-2">واتساب</h3>
               <p className="text-muted-foreground text-sm">تواصل مباشر وسريع</p>
-            </div>
+            </button>
 
             <div className="bg-card border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-300">
               <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center mx-auto mb-4">
@@ -48,10 +66,11 @@ const ContactSection = () => {
 
           {/* CTA */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button variant="hero" size="xl">
+            <Button variant="hero" size="xl" onClick={handleTelegramClick}>
+              <Send className="w-5 h-5 ml-2" />
               ابدأ الاستثمار الآن
             </Button>
-            <Button variant="outline" size="xl">
+            <Button variant="outline" size="xl" onClick={handleWhatsAppClick}>
               <MessageCircle className="w-5 h-5 ml-2" />
               تواصل عبر واتساب
             </Button>
