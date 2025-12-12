@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { ArrowDown, Shield, TrendingUp, Users } from "lucide-react";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const stats = [
     { icon: Users, value: "5000+", label: "مستثمر نشط" },
     { icon: TrendingUp, value: "98%", label: "نسبة النجاح" },
@@ -42,10 +44,10 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <Button variant="hero" size="xl">
+            <Button variant="hero" size="xl" onClick={() => navigate("/packages")}>
               ابدأ رحلة الاستثمار
             </Button>
-            <Button variant="outline" size="xl">
+            <Button variant="outline" size="xl" onClick={() => navigate("/packages")}>
               تعرف على الباقات
             </Button>
           </div>
