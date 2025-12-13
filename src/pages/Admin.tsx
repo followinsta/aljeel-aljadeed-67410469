@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, CreditCard, MessageSquare, Settings } from "lucide-react";
+import { Package, CreditCard, MessageSquare, Settings, Users } from "lucide-react";
 import AdminPackages from "@/components/admin/AdminPackages";
 import AdminPaymentMethods from "@/components/admin/AdminPaymentMethods";
 import AdminComments from "@/components/admin/AdminComments";
 import AdminSettings from "@/components/admin/AdminSettings";
+import AdminInvestors from "@/components/admin/AdminInvestors";
 
 const Admin = () => {
   const { user, isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("investors");
 
   useEffect(() => {
     if (!isLoading && (!user || !isAdmin)) {
@@ -35,11 +37,15 @@ const Admin = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">لوحة تحكم المدير</h1>
-          <p className="text-muted-foreground mt-2">إدارة الباقات والتعليقات وطرق الدفع</p>
+          <p className="text-muted-foreground mt-2">مستثمرين الجيل الجديد - إدارة شاملة</p>
         </div>
 
-        <Tabs defaultValue="packages" className="w-full" dir="rtl">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" dir="rtl">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
+            <TabsTrigger value="investors" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">المستثمرين</span>
+            </TabsTrigger>
             <TabsTrigger value="packages" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               <span className="hidden sm:inline">الباقات</span>
@@ -57,6 +63,10 @@ const Admin = () => {
               <span className="hidden sm:inline">الإعدادات</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="investors">
+            <AdminInvestors />
+          </TabsContent>
 
           <TabsContent value="packages">
             <AdminPackages />

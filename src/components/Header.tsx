@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Menu, X, TrendingUp, LogIn, LogOut, User } from "lucide-react";
+import { Menu, X, TrendingUp, LogIn, LogOut, User, FileText, BarChart3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const navLinks = [
     { href: "#home", label: "الرئيسية" },
@@ -20,12 +21,22 @@ const Header = () => {
     await signOut();
   };
 
+  const handleNavClick = (href: string) => {
+    const elementId = href.replace("#", "");
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/" + href);
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#home" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-gold rounded-xl flex items-center justify-center shadow-gold">
               <TrendingUp className="w-6 h-6 text-primary-foreground" />
             </div>
@@ -33,7 +44,7 @@ const Header = () => {
               <h1 className="text-xl font-bold text-gradient-gold">الجيل الجديد</h1>
               <p className="text-xs text-muted-foreground">للاستثمار</p>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
@@ -41,11 +52,18 @@ const Header = () => {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
+                onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium cursor-pointer"
               >
                 {link.label}
               </a>
             ))}
+            <Link
+              to="/subscription-policy"
+              className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
+            >
+              سياسة الاشتراك
+            </Link>
           </nav>
 
           {/* Auth Buttons */}
@@ -57,6 +75,14 @@ const Header = () => {
                     <Button variant="outline" size="sm" className="gap-2">
                       <User className="w-4 h-4" />
                       لوحة التحكم
+                    </Button>
+                  </Link>
+                )}
+                {!isAdmin && (
+                  <Link to="/investor-dashboard">
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <BarChart3 className="w-4 h-4" />
+                      حسابي
                     </Button>
                   </Link>
                 )}
@@ -93,12 +119,19 @@ const Header = () => {
               <a
                 key={link.href}
                 href={link.href}
-                onClick={() => setIsMenuOpen(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium py-2"
+                onClick={(e) => { e.preventDefault(); handleNavClick(link.href); setIsMenuOpen(false); }}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium py-2 cursor-pointer"
               >
                 {link.label}
               </a>
             ))}
+            <Link
+              to="/subscription-policy"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium py-2"
+            >
+              سياسة الاشتراك
+            </Link>
             {user ? (
               <>
                 {isAdmin && (
@@ -106,6 +139,14 @@ const Header = () => {
                     <Button variant="outline" className="w-full gap-2">
                       <User className="w-4 h-4" />
                       لوحة التحكم
+                    </Button>
+                  </Link>
+                )}
+                {!isAdmin && (
+                  <Link to="/investor-dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full gap-2">
+                      <BarChart3 className="w-4 h-4" />
+                      حسابي
                     </Button>
                   </Link>
                 )}

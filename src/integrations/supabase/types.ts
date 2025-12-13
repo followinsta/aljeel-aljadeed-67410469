@@ -44,6 +44,142 @@ export type Database = {
         }
         Relationships: []
       }
+      investor_fees: {
+        Row: {
+          amount: number | null
+          created_at: string
+          fee_type: string
+          id: string
+          investor_id: string
+          is_paid: boolean
+          paid_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          fee_type: string
+          id?: string
+          investor_id: string
+          is_paid?: boolean
+          paid_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          fee_type?: string
+          id?: string
+          investor_id?: string
+          is_paid?: boolean
+          paid_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investor_fees_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "investors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investor_profit_history: {
+        Row: {
+          created_at: string
+          cumulative_profit: number
+          id: string
+          investor_id: string
+          profit_amount: number
+          profit_date: string
+        }
+        Insert: {
+          created_at?: string
+          cumulative_profit?: number
+          id?: string
+          investor_id: string
+          profit_amount: number
+          profit_date: string
+        }
+        Update: {
+          created_at?: string
+          cumulative_profit?: number
+          id?: string
+          investor_id?: string
+          profit_amount?: number
+          profit_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investor_profit_history_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "investors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investors: {
+        Row: {
+          bank_account_number: string | null
+          bank_name: string | null
+          created_at: string
+          daily_profit: number
+          email: string | null
+          full_name: string
+          iban: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          password_hash: string | null
+          phone: string | null
+          subscription_amount: number
+          subscription_duration_days: number
+          subscription_duration_months: number
+          subscription_start_date: string
+          total_accumulated_profit: number
+          updated_at: string
+        }
+        Insert: {
+          bank_account_number?: string | null
+          bank_name?: string | null
+          created_at?: string
+          daily_profit?: number
+          email?: string | null
+          full_name: string
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          password_hash?: string | null
+          phone?: string | null
+          subscription_amount?: number
+          subscription_duration_days?: number
+          subscription_duration_months?: number
+          subscription_start_date?: string
+          total_accumulated_profit?: number
+          updated_at?: string
+        }
+        Update: {
+          bank_account_number?: string | null
+          bank_name?: string | null
+          created_at?: string
+          daily_profit?: number
+          email?: string | null
+          full_name?: string
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          password_hash?: string | null
+          phone?: string | null
+          subscription_amount?: number
+          subscription_duration_days?: number
+          subscription_duration_months?: number
+          subscription_start_date?: string
+          total_accumulated_profit?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       packages: {
         Row: {
           created_at: string

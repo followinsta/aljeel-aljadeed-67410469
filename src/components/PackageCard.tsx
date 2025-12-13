@@ -93,7 +93,7 @@ const PackageCard = ({
       </div>
 
       {/* CTA */}
-      <Button variant="gold" className="w-full" onClick={() => navigate("/packages")}>
+      <Button variant="gold" className="w-full" onClick={() => id ? navigate(`/checkout/${id}`) : navigate("/packages")}>
         ابدأ الاستثمار الآن
       </Button>
 

@@ -18,16 +18,32 @@ const Footer = () => {
 
           {/* Links */}
           <nav className="flex flex-wrap items-center justify-center gap-6">
-            <a href="#packages" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a 
+              href="/#packages" 
+              onClick={(e) => { e.preventDefault(); document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth' }); }}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
               الباقات
             </a>
-            <a href="#business" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a 
+              href="/#business" 
+              onClick={(e) => { e.preventDefault(); document.getElementById('business')?.scrollIntoView({ behavior: 'smooth' }); }}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
               رجال الأعمال
             </a>
-            <a href="#about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a 
+              href="/#about" 
+              onClick={(e) => { e.preventDefault(); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
               من نحن
             </a>
-            <a href="#contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a 
+              href="/#contact" 
+              onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
               تواصل معنا
             </a>
           </nav>
