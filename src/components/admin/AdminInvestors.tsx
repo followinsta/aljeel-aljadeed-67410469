@@ -1,0 +1,676 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  Search,
+  User,
+  Phone,
+  CreditCard,
+  Calendar,
+  TrendingUp,
+  CheckCircle2,
+  XCircle,
+  Eye
+} from "lucide-react";
+
+interface Investor {
+  id: string;
+  full_name: string;
+  phone: string | null;
+  bank_account_number: string | null;
+  iban: string | null;
+  bank_name: string | null;
+  subscription_amount: number;
+  daily_profit: number;
+  subscription_duration_months: number;
+  subscription_duration_days: number;
+  subscription_start_date: string;
+  total_accumulated_profit: number;
+  is_active: boolean;
+  email: string | null;
+  notes: string | null;
+}
+
+interface InvestorFee {
+  id: string;
+  investor_id: string;
+  fee_type: string;
+  is_paid: boolean;
+  amount: number | null;
+}
+
+const FEE_TYPES = [
+  "رسوم تحويل الارباح",
+  "رسوم الشبكه",
+  "رسوم إنشاء المحفظة",
+  "رسوم إدارة المحفظة",
+  "رسوم أتعاب الموظف والمعاملات الأدارية"
+];
+
+const AdminInvestors = () => {
+  const { toast } = useToast();
+  const [investors, setInvestors] = useState<Investor[]>([]);
+  const [filteredInvestors, setFilteredInvestors] = useState<Investor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [editingInvestor, setEditingInvestor] = useState<Investor | null>(null);
+  const [viewingInvestor, setViewingInvestor] = useState<Investor | null>(null);
+  const [investorFees, setInvestorFees] = useState<InvestorFee[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFeeTypes, setSelectedFeeTypes] = useState<string[]>([]);
+  
+  const [formData, setFormData] = useState({
+    full_name: "",
+    phone: "",
+    bank_account_number: "",
+    iban: "",
+    bank_name: "",
+    subscription_amount: "",
+    daily_profit: "",
+    subscription_duration_months: "4",
+    subscription_duration_days: "120",
+    subscription_start_date: new Date().toISOString().split("T")[0],
+    is_active: true,
+    email: "",
+    notes: "",
+    is_previous_subscriber: false,
+    previous_accumulated_profit: "0"
+  });
+
+  useEffect(() => {
+    fetchInvestors();
+  }, []);
+
+  useEffect(() => {
+    const filtered = investors.filter(inv => 
+      inv.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (inv.phone && inv.phone.includes(searchTerm)) ||
+      (inv.email && inv.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    setFilteredInvestors(filtered);
+  }, [searchTerm, investors]);
+
+  const fetchInvestors = async () => {
+    const { data, error } = await supabase
+      .from("investors")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setInvestors(data);
+      setFilteredInvestors(data);
+    }
+    setIsLoading(false);
+  };
+
+  const fetchInvestorFees = async (investorId: string) => {
+    const { data } = await supabase
+      .from("investor_fees")
+      .select("*")
+      .eq("investor_id", investorId);
+    
+    if (data) {
+      setInvestorFees(data);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const investorData = {
+      full_name: formData.full_name,
+      phone: formData.phone || null,
+      bank_account_number: formData.bank_account_number || null,
+      iban: formData.iban || null,
+      bank_name: formData.bank_name || null,
+      subscription_amount: parseFloat(formData.subscription_amount) || 0,
+      daily_profit: parseFloat(formData.daily_profit) || 0,
+      subscription_duration_months: parseInt(formData.subscription_duration_months) || 4,
+      subscription_duration_days: parseInt(formData.subscription_duration_days) || 120,
+      subscription_start_date: formData.subscription_start_date,
+      is_active: formData.is_active,
+      email: formData.email || null,
+      notes: formData.notes || null,
+      total_accumulated_profit: formData.is_previous_subscriber ? parseFloat(formData.previous_accumulated_profit) || 0 : 0
+    };
+
+    if (editingInvestor) {
+      const { error } = await supabase
+        .from("investors")
+        .update(investorData)
+        .eq("id", editingInvestor.id);
+
+      if (error) {
+        toast({ title: "خطأ", description: "فشل تحديث بيانات المستثمر", variant: "destructive" });
+        return;
+      }
+
+      // Update fees
+      await updateInvestorFees(editingInvestor.id);
+
+      toast({ title: "تم التحديث", description: "تم تحديث بيانات المستثمر بنجاح" });
+    } else {
+      const { data, error } = await supabase
+        .from("investors")
+        .insert([investorData])
+        .select()
+        .single();
+
+      if (error) {
+        toast({ title: "خطأ", description: "فشل إضافة المستثمر", variant: "destructive" });
+        return;
+      }
+
+      // Add selected fees
+      if (selectedFeeTypes.length > 0 && data) {
+        const feesToInsert = selectedFeeTypes.map(feeType => ({
+          investor_id: data.id,
+          fee_type: feeType,
+          is_paid: false
+        }));
+        await supabase.from("investor_fees").insert(feesToInsert);
+      }
+
+      // Generate profit history if previous subscriber
+      if (formData.is_previous_subscriber && data) {
+        await generateProfitHistory(data.id, formData.subscription_start_date, parseFloat(formData.daily_profit));
+      }
+
+      toast({ title: "تمت الإضافة", description: "تم إضافة المستثمر بنجاح" });
+    }
+
+    resetForm();
+    setIsDialogOpen(false);
+    fetchInvestors();
+  };
+
+  const generateProfitHistory = async (investorId: string, startDate: string, dailyProfit: number) => {
+    const start = new Date(startDate);
+    const today = new Date();
+    const records = [];
+    let cumulativeProfit = 0;
+
+    for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+      cumulativeProfit += dailyProfit;
+      records.push({
+        investor_id: investorId,
+        profit_amount: dailyProfit,
+        profit_date: d.toISOString().split("T")[0],
+        cumulative_profit: cumulativeProfit
+      });
+    }
+
+    if (records.length > 0) {
+      await supabase.from("investor_profit_history").insert(records);
+      await supabase.from("investors").update({ total_accumulated_profit: cumulativeProfit }).eq("id", investorId);
+    }
+  };
+
+  const updateInvestorFees = async (investorId: string) => {
+    // Delete existing fees
+    await supabase.from("investor_fees").delete().eq("investor_id", investorId);
+    
+    // Insert new fees
+    if (selectedFeeTypes.length > 0) {
+      const feesToInsert = selectedFeeTypes.map(feeType => ({
+        investor_id: investorId,
+        fee_type: feeType,
+        is_paid: investorFees.find(f => f.fee_type === feeType)?.is_paid || false
+      }));
+      await supabase.from("investor_fees").insert(feesToInsert);
+    }
+  };
+
+  const handleEdit = async (investor: Investor) => {
+    setEditingInvestor(investor);
+    setFormData({
+      full_name: investor.full_name,
+      phone: investor.phone || "",
+      bank_account_number: investor.bank_account_number || "",
+      iban: investor.iban || "",
+      bank_name: investor.bank_name || "",
+      subscription_amount: investor.subscription_amount.toString(),
+      daily_profit: investor.daily_profit.toString(),
+      subscription_duration_months: investor.subscription_duration_months.toString(),
+      subscription_duration_days: investor.subscription_duration_days.toString(),
+      subscription_start_date: investor.subscription_start_date,
+      is_active: investor.is_active,
+      email: investor.email || "",
+      notes: investor.notes || "",
+      is_previous_subscriber: false,
+      previous_accumulated_profit: investor.total_accumulated_profit.toString()
+    });
+    
+    await fetchInvestorFees(investor.id);
+    setSelectedFeeTypes(investorFees.map(f => f.fee_type));
+    setIsDialogOpen(true);
+  };
+
+  const handleView = async (investor: Investor) => {
+    setViewingInvestor(investor);
+    await fetchInvestorFees(investor.id);
+    setIsViewDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("هل أنت متأكد من حذف هذا المستثمر؟")) return;
+
+    const { error } = await supabase.from("investors").delete().eq("id", id);
+
+    if (error) {
+      toast({ title: "خطأ", description: "فشل حذف المستثمر", variant: "destructive" });
+      return;
+    }
+
+    toast({ title: "تم الحذف", description: "تم حذف المستثمر بنجاح" });
+    fetchInvestors();
+  };
+
+  const toggleFeePaid = async (feeId: string, currentStatus: boolean) => {
+    await supabase
+      .from("investor_fees")
+      .update({ is_paid: !currentStatus, paid_at: !currentStatus ? new Date().toISOString() : null })
+      .eq("id", feeId);
+    
+    if (viewingInvestor) {
+      await fetchInvestorFees(viewingInvestor.id);
+    }
+    toast({ title: "تم التحديث", description: `تم ${!currentStatus ? 'تأكيد' : 'إلغاء'} الدفع` });
+  };
+
+  const resetForm = () => {
+    setFormData({
+      full_name: "",
+      phone: "",
+      bank_account_number: "",
+      iban: "",
+      bank_name: "",
+      subscription_amount: "",
+      daily_profit: "",
+      subscription_duration_months: "4",
+      subscription_duration_days: "120",
+      subscription_start_date: new Date().toISOString().split("T")[0],
+      is_active: true,
+      email: "",
+      notes: "",
+      is_previous_subscriber: false,
+      previous_accumulated_profit: "0"
+    });
+    setEditingInvestor(null);
+    setSelectedFeeTypes([]);
+    setInvestorFees([]);
+  };
+
+  const formatNumber = (num: number) => num.toLocaleString("ar-SA");
+
+  const activeInvestors = investors.filter(i => i.is_active).length;
+
+  if (isLoading) {
+    return <div className="text-center py-8">جاري التحميل...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <User className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm">إجمالي المستثمرين</p>
+                <p className="text-2xl font-bold">{formatNumber(investors.length)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm">المستثمرين النشطين</p>
+                <p className="text-2xl font-bold text-green-500">{formatNumber(activeInvestors)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-accent" />
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm">إجمالي الاستثمارات</p>
+                <p className="text-2xl font-bold text-accent">
+                  {formatNumber(investors.reduce((sum, i) => sum + i.subscription_amount, 0))} ريال
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Add */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            placeholder="بحث بالاسم أو الهاتف أو البريد..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pr-10"
+          />
+        </div>
+        
+        <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
+          <DialogTrigger asChild>
+            <Button variant="gold" className="gap-2">
+              <Plus className="w-4 h-4" />
+              إضافة مستثمر
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editingInvestor ? "تعديل بيانات المستثمر" : "إضافة مستثمر جديد"}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>الاسم الكامل *</Label>
+                  <Input
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>رقم الهاتف</Label>
+                  <Input
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>البريد الإلكتروني</Label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>اسم البنك</Label>
+                  <Input
+                    value={formData.bank_name}
+                    onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>رقم الحساب</Label>
+                  <Input
+                    value={formData.bank_account_number}
+                    onChange={(e) => setFormData({ ...formData, bank_account_number: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>الآيبان</Label>
+                  <Input
+                    value={formData.iban}
+                    onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>مبلغ الاشتراك *</Label>
+                  <Input
+                    type="number"
+                    value={formData.subscription_amount}
+                    onChange={(e) => setFormData({ ...formData, subscription_amount: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>الربح اليومي *</Label>
+                  <Input
+                    type="number"
+                    value={formData.daily_profit}
+                    onChange={(e) => setFormData({ ...formData, daily_profit: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>مدة الاشتراك (أشهر)</Label>
+                  <Input
+                    type="number"
+                    value={formData.subscription_duration_months}
+                    onChange={(e) => setFormData({ ...formData, subscription_duration_months: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>مدة الاشتراك (أيام)</Label>
+                  <Input
+                    type="number"
+                    value={formData.subscription_duration_days}
+                    onChange={(e) => setFormData({ ...formData, subscription_duration_days: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>تاريخ بداية الاشتراك</Label>
+                  <Input
+                    type="date"
+                    value={formData.subscription_start_date}
+                    onChange={(e) => setFormData({ ...formData, subscription_start_date: e.target.value })}
+                  />
+                </div>
+                <div className="flex items-center gap-2 pt-6">
+                  <Switch
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                  <Label>نشط</Label>
+                </div>
+              </div>
+
+              {!editingInvestor && (
+                <div className="flex items-center gap-2 p-3 bg-secondary/30 rounded-lg">
+                  <Checkbox
+                    checked={formData.is_previous_subscriber}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_previous_subscriber: !!checked })}
+                  />
+                  <Label>مشترك سابق (سيتم إنشاء سجل أرباح من تاريخ البداية)</Label>
+                </div>
+              )}
+
+              {formData.is_previous_subscriber && (
+                <div>
+                  <Label>الأرباح المتراكمة الحالية</Label>
+                  <Input
+                    type="number"
+                    value={formData.previous_accumulated_profit}
+                    onChange={(e) => setFormData({ ...formData, previous_accumulated_profit: e.target.value })}
+                  />
+                </div>
+              )}
+
+              {/* Fee Types Selection */}
+              <div>
+                <Label className="mb-3 block">أنواع الرسوم المطلوبة</Label>
+                <div className="space-y-2">
+                  {FEE_TYPES.map((feeType) => (
+                    <div key={feeType} className="flex items-center gap-2">
+                      <Checkbox
+                        checked={selectedFeeTypes.includes(feeType)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedFeeTypes([...selectedFeeTypes, feeType]);
+                          } else {
+                            setSelectedFeeTypes(selectedFeeTypes.filter(f => f !== feeType));
+                          }
+                        }}
+                      />
+                      <Label className="font-normal">{feeType}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label>ملاحظات</Label>
+                <Input
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                />
+              </div>
+
+              <Button type="submit" variant="gold" className="w-full">
+                {editingInvestor ? "تحديث" : "إضافة"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Investors List */}
+      <div className="grid gap-4">
+        {filteredInvestors.map((investor) => (
+          <Card key={investor.id} className="bg-card border-border">
+            <CardContent className="p-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${investor.is_active ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                    <User className={`w-6 h-6 ${investor.is_active ? 'text-green-500' : 'text-red-500'}`} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">{investor.full_name}</h3>
+                    <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                      {investor.phone && (
+                        <span className="flex items-center gap-1">
+                          <Phone className="w-3 h-3" />
+                          {investor.phone}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <CreditCard className="w-3 h-3" />
+                        {formatNumber(investor.subscription_amount)} ريال
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        {formatNumber(investor.daily_profit)} ريال/يوم
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {investor.subscription_start_date}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <div className="text-left ml-4">
+                    <p className="text-muted-foreground text-xs">الأرباح المتراكمة</p>
+                    <p className="text-accent font-bold">{formatNumber(investor.total_accumulated_profit)} ريال</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => handleView(investor)}>
+                    <Eye className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => handleEdit(investor)}>
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => handleDelete(investor.id)}>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {filteredInvestors.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground">
+          لا يوجد مستثمرين
+        </div>
+      )}
+
+      {/* View Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>تفاصيل المستثمر</DialogTitle>
+          </DialogHeader>
+          {viewingInvestor && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-muted-foreground text-sm">الاسم</p>
+                  <p className="font-medium">{viewingInvestor.full_name}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">الهاتف</p>
+                  <p className="font-medium">{viewingInvestor.phone || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">مبلغ الاشتراك</p>
+                  <p className="font-medium">{formatNumber(viewingInvestor.subscription_amount)} ريال</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">الربح اليومي</p>
+                  <p className="font-medium text-accent">{formatNumber(viewingInvestor.daily_profit)} ريال</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">الأرباح المتراكمة</p>
+                  <p className="font-medium text-primary">{formatNumber(viewingInvestor.total_accumulated_profit)} ريال</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">تاريخ البداية</p>
+                  <p className="font-medium">{viewingInvestor.subscription_start_date}</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-bold mb-3">حالة الرسوم (اضغط لتغيير الحالة)</h4>
+                <div className="space-y-2">
+                  {investorFees.map((fee) => (
+                    <div
+                      key={fee.id}
+                      onClick={() => toggleFeePaid(fee.id, fee.is_paid)}
+                      className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors"
+                    >
+                      <span>{fee.fee_type}</span>
+                      {fee.is_paid ? (
+                        <CheckCircle2 className="w-6 h-6 text-green-500" />
+                      ) : (
+                        <XCircle className="w-6 h-6 text-red-500" />
+                      )}
+                    </div>
+                  ))}
+                  {investorFees.length === 0 && (
+                    <p className="text-muted-foreground text-center py-4">لا توجد رسوم مسجلة</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminInvestors;

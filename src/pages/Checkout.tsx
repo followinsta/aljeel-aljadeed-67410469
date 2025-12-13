@@ -98,16 +98,18 @@ const Checkout = () => {
   };
 
   const handleWhatsAppReceipt = () => {
-    const whatsapp = settings.whatsapp_number || "966545189624";
+    const whatsappNumber = settings.whatsapp_number || "966545189624";
+    // Remove any non-digit characters except + at the start
+    const cleanNumber = whatsappNumber.replace(/[^\d+]/g, '').replace(/^\+/, '');
     const message = pkg 
       ? `مرحباً، أريد إرسال إيصال التحويل للباقة رقم ${pkg.package_number} - مبلغ ${formatNumber(pkg.investment_amount)} ريال`
       : "مرحباً، أريد إرسال إيصال التحويل";
-    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const handleTelegramReceipt = () => {
-    const telegram = settings.telegram_link || "https://t.me/+2uEtg05UmVc0Yjk0";
-    window.open(telegram, "_blank");
+    // Use T.me/aljeil for receipts
+    window.open("https://t.me/aljeil", "_blank");
   };
 
   if (loading) {
