@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { TrendingUp, Crown } from "lucide-react";
 
 interface PackageCardProps {
+  id?: string;
   packageNumber: number;
   investment: number;
   dailyProfit: number;
@@ -11,12 +13,14 @@ interface PackageCardProps {
 }
 
 const PackageCard = ({
+  id,
   packageNumber,
   investment,
   dailyProfit,
   isBusinessPackage = false,
   featured = false,
 }: PackageCardProps) => {
+  const navigate = useNavigate();
   const formatNumber = (num: number) => {
     return num.toLocaleString("ar-SA");
   };
@@ -89,7 +93,7 @@ const PackageCard = ({
       </div>
 
       {/* CTA */}
-      <Button variant="gold" className="w-full">
+      <Button variant="gold" className="w-full" onClick={() => navigate("/packages")}>
         ابدأ الاستثمار الآن
       </Button>
 
