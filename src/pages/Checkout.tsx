@@ -134,7 +134,7 @@ const Checkout = () => {
   const totalProfit = pkg.daily_profit * (pkg.investment_period_days || 120);
   const totalReturn = pkg.investment_amount + totalProfit;
 
-  const bankMethods = paymentMethods.filter(m => m.method_type === "bank");
+  const bankMethods = paymentMethods.filter(m => m.method_type === "bank_transfer" || m.method_type === "bank");
 
   return (
     <main className="min-h-screen bg-background">
