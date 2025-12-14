@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, CreditCard, MessageSquare, Settings, Users } from "lucide-react";
+import { Package, CreditCard, MessageSquare, Settings, Users, FileText } from "lucide-react";
 import AdminPackages from "@/components/admin/AdminPackages";
 import AdminPaymentMethods from "@/components/admin/AdminPaymentMethods";
 import AdminComments from "@/components/admin/AdminComments";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminInvestors from "@/components/admin/AdminInvestors";
+import AdminSubscriptionPolicy from "@/components/admin/AdminSubscriptionPolicy";
 
 const Admin = () => {
   const { user, isAdmin, isLoading } = useAuth();
@@ -41,7 +42,7 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" dir="rtl">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="investors" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">المستثمرين</span>
@@ -57,6 +58,10 @@ const Admin = () => {
             <TabsTrigger value="comments" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
               <span className="hidden sm:inline">التعليقات</span>
+            </TabsTrigger>
+            <TabsTrigger value="policy" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">سياسة الاشتراك</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -78,6 +83,10 @@ const Admin = () => {
 
           <TabsContent value="comments">
             <AdminComments />
+          </TabsContent>
+
+          <TabsContent value="policy">
+            <AdminSubscriptionPolicy />
           </TabsContent>
 
           <TabsContent value="settings">
