@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, CreditCard, MessageSquare, Settings, Users, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Package, CreditCard, MessageSquare, Settings, Users, FileText, Home } from "lucide-react";
 import AdminPackages from "@/components/admin/AdminPackages";
 import AdminPaymentMethods from "@/components/admin/AdminPaymentMethods";
 import AdminComments from "@/components/admin/AdminComments";
@@ -36,9 +37,17 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">لوحة تحكم المدير</h1>
-          <p className="text-muted-foreground mt-2">مستثمرين الجيل الجديد - إدارة شاملة</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">لوحة تحكم المدير</h1>
+            <p className="text-muted-foreground mt-2">مستثمرين الجيل الجديد - إدارة شاملة</p>
+          </div>
+          <Link to="/">
+            <Button variant="outline" className="gap-2">
+              <Home className="w-4 h-4" />
+              العودة للرئيسية
+            </Button>
+          </Link>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" dir="rtl">

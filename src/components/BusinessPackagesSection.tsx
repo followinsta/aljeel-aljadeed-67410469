@@ -1,16 +1,32 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import PackageCard from "./PackageCard";
 import { Crown } from "lucide-react";
 
+interface Package {
+  id: string;
+  package_number: number;
+  investment_amount: number;
+  daily_profit: number;
+  is_featured: boolean;
+  is_business: boolean;
+}
+
 const BusinessPackagesSection = () => {
-  const packages = [
-    { number: 6, investment: 6000, profit: 2800 },
-    { number: 7, investment: 8000, profit: 3800 },
-    { number: 8, investment: 10000, profit: 4600 },
-    { number: 9, investment: 20000, profit: 9500, featured: true },
-    { number: 10, investment: 30000, profit: 14600 },
-    { number: 11, investment: 40000, profit: 19000 },
-    { number: 12, investment: 50000, profit: 24600 },
-  ];
+  const [packages, setPackages] = useState<Package[]>([]);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      const { data } = await supabase
+        .from("packages")
+        .select("*")
+        .eq("is_active", true)
+        .eq("is_business", true)
+        .order("package_number", { ascending: true });
+      if (data) setPackages(data);
+    };
+    fetchPackages();
+  }, []);
 
   return (
     <section id="business" className="py-24 bg-gradient-hero relative">
@@ -40,12 +56,13 @@ const BusinessPackagesSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
           {packages.map((pkg) => (
             <PackageCard
-              key={pkg.number}
-              packageNumber={pkg.number}
-              investment={pkg.investment}
-              dailyProfit={pkg.profit}
+              key={pkg.id}
+              id={pkg.id}
+              packageNumber={pkg.package_number}
+              investment={pkg.investment_amount}
+              dailyProfit={pkg.daily_profit}
               isBusinessPackage
-              featured={pkg.featured}
+              featured={pkg.is_featured}
             />
           ))}
         </div>
