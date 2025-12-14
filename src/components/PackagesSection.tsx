@@ -1,15 +1,32 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import PackageCard from "./PackageCard";
 import { Sparkles } from "lucide-react";
 
+interface Package {
+  id: string;
+  package_number: number;
+  investment_amount: number;
+  daily_profit: number;
+  is_featured: boolean;
+  is_business: boolean;
+}
+
 const PackagesSection = () => {
-  const packages = [
-    { number: 0, investment: 500, profit: 200 },
-    { number: 1, investment: 1000, profit: 450 },
-    { number: 2, investment: 2000, profit: 990, featured: true },
-    { number: 3, investment: 3000, profit: 1450 },
-    { number: 4, investment: 4000, profit: 1990 },
-    { number: 5, investment: 5000, profit: 2460 },
-  ];
+  const [packages, setPackages] = useState<Package[]>([]);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      const { data } = await supabase
+        .from("packages")
+        .select("*")
+        .eq("is_active", true)
+        .eq("is_business", false)
+        .order("package_number", { ascending: true });
+      if (data) setPackages(data);
+    };
+    fetchPackages();
+  }, []);
 
   return (
     <section id="packages" className="py-24 bg-background relative">
@@ -35,11 +52,12 @@ const PackagesSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {packages.map((pkg) => (
             <PackageCard
-              key={pkg.number}
-              packageNumber={pkg.number}
-              investment={pkg.investment}
-              dailyProfit={pkg.profit}
-              featured={pkg.featured}
+              key={pkg.id}
+              id={pkg.id}
+              packageNumber={pkg.package_number}
+              investment={pkg.investment_amount}
+              dailyProfit={pkg.daily_profit}
+              featured={pkg.is_featured}
             />
           ))}
         </div>

@@ -99,16 +99,16 @@ const Checkout = () => {
 
   const handleWhatsAppReceipt = () => {
     const whatsappNumber = settings.whatsapp_number || "966545189624";
-    // Remove any non-digit characters except + at the start
-    const cleanNumber = whatsappNumber.replace(/[^\d+]/g, '').replace(/^\+/, '');
+    // Remove any non-digit characters
+    const cleanNumber = whatsappNumber.replace(/[^\d]/g, '');
     const message = pkg 
       ? `مرحباً، أريد إرسال إيصال التحويل للباقة رقم ${pkg.package_number} - مبلغ ${formatNumber(pkg.investment_amount)} ريال`
       : "مرحباً، أريد إرسال إيصال التحويل";
-    window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const handleTelegramReceipt = () => {
-    // Use T.me/aljeil for receipts
+    // Direct to T.me/aljeil
     window.open("https://t.me/aljeil", "_blank");
   };
 
@@ -153,7 +153,11 @@ const Checkout = () => {
           </Button>
 
           <h1 className="text-3xl font-bold mb-8 text-center">
-            إتمام <span className="text-gradient-gold">الاشتراك</span>
+            {settings.checkout_title ? (
+              <>{settings.checkout_title.split(' ')[0]} <span className="text-gradient-gold">{settings.checkout_title.split(' ').slice(1).join(' ')}</span></>
+            ) : (
+              <>إتمام <span className="text-gradient-gold">الاشتراك</span></>
+            )}
           </h1>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -234,7 +238,8 @@ const Checkout = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {bankMethods.length > 0 ? (
+                {/* Only show bank section if contact_only_mode is false and there are bank methods */}
+                {settings.contact_only_mode !== "true" && bankMethods.length > 0 && (
                   <div className="space-y-4">
                     {bankMethods.map((method) => (
                       <div key={method.id} className="bg-secondary/50 rounded-xl p-4">
@@ -266,16 +271,12 @@ const Checkout = () => {
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-muted-foreground text-center py-4">
-                    لا توجد حسابات بنكية متاحة حالياً
-                  </p>
                 )}
 
                 {/* Send Receipt Buttons */}
                 <div className="pt-4 border-t border-border space-y-3">
                   <p className="text-center text-muted-foreground text-sm mb-4">
-                    بعد التحويل، أرسل إيصال التحويل عبر:
+                    {settings.checkout_subtitle || "بعد التحويل، أرسل إيصال التحويل عبر:"}
                   </p>
 
                   <Button 
@@ -284,7 +285,7 @@ const Checkout = () => {
                     onClick={handleWhatsAppReceipt}
                   >
                     <MessageCircle className="w-5 h-5 ml-2" />
-                    إرسال الإيصال عبر واتساب
+                    {settings.whatsapp_button_text || "إرسال الإيصال عبر واتساب"}
                   </Button>
 
                   <Button 
@@ -293,7 +294,7 @@ const Checkout = () => {
                     onClick={handleTelegramReceipt}
                   >
                     <Send className="w-5 h-5 ml-2" />
-                    إرسال الإيصال عبر تلقرام
+                    {settings.telegram_button_text || "إرسال الإيصال عبر تلقرام"}
                   </Button>
                 </div>
               </CardContent>
