@@ -128,6 +128,7 @@ export type Database = {
           iban: string | null
           id: string
           is_active: boolean
+          linked_customer_id: string | null
           notes: string | null
           password_hash: string | null
           phone: string | null
@@ -148,6 +149,7 @@ export type Database = {
           iban?: string | null
           id?: string
           is_active?: boolean
+          linked_customer_id?: string | null
           notes?: string | null
           password_hash?: string | null
           phone?: string | null
@@ -168,6 +170,7 @@ export type Database = {
           iban?: string | null
           id?: string
           is_active?: boolean
+          linked_customer_id?: string | null
           notes?: string | null
           password_hash?: string | null
           phone?: string | null
@@ -274,6 +277,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          customer_id: string | null
           email: string | null
           full_name: string | null
           id: string
@@ -284,6 +288,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          customer_id?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
@@ -294,6 +299,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          customer_id?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
@@ -323,6 +329,65 @@ export type Database = {
           value?: string | null
         }
         Relationships: []
+      }
+      subscription_requests: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          email: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          package_amount: number | null
+          package_id: string | null
+          package_name: string | null
+          phone: string | null
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          package_amount?: number | null
+          package_id?: string | null
+          package_name?: string | null
+          phone?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          package_amount?: number | null
+          package_id?: string | null
+          package_name?: string | null
+          phone?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_requests_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

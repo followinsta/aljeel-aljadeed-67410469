@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 import { 
   ArrowLeft, 
   TrendingUp, 
@@ -43,17 +45,26 @@ interface SiteSetting {
   value: string | null;
 }
 
+interface UserProfile {
+  customer_id: string | null;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+}
+
 const Checkout = () => {
   const { packageId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [pkg, setPkg] = useState<Package | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     fetchData();
-  }, [packageId]);
+  }, [packageId, user]);
 
   const fetchData = async () => {
     // Fetch package
@@ -90,24 +101,62 @@ const Checkout = () => {
       setSettings(settingsMap);
     }
 
+    // Fetch user profile if logged in
+    if (user) {
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("customer_id, full_name, email, phone")
+        .eq("user_id", user.id)
+        .single();
+
+      if (profileData) {
+        setUserProfile(profileData);
+      }
+    }
+
     setLoading(false);
+  };
+
+  const createSubscriptionRequest = async () => {
+    if (!user || !pkg) return;
+
+    const { error } = await supabase
+      .from("subscription_requests")
+      .insert({
+        user_id: user.id,
+        customer_id: userProfile?.customer_id,
+        full_name: userProfile?.full_name || user.email || "مجهول",
+        email: userProfile?.email || user.email,
+        phone: userProfile?.phone,
+        package_id: pkg.id,
+        package_name: pkg.name || `باقة رقم ${pkg.package_number}`,
+        package_amount: pkg.investment_amount,
+        status: "pending"
+      });
+
+    if (!error) {
+      toast.success("تم إرسال طلب الاشتراك بنجاح");
+    }
   };
 
   const formatNumber = (num: number) => {
     return num.toLocaleString("ar-SA");
   };
 
-  const handleWhatsAppReceipt = () => {
+  const handleWhatsAppReceipt = async () => {
+    await createSubscriptionRequest();
     const whatsappNumber = settings.whatsapp_number || "966545189624";
     // Remove any non-digit characters
     const cleanNumber = whatsappNumber.replace(/[^\d]/g, '');
+    const customerIdText = userProfile?.customer_id ? ` - رقم العميل: ${userProfile.customer_id}` : '';
     const message = pkg 
-      ? `مرحباً، أريد إرسال إيصال التحويل للباقة رقم ${pkg.package_number} - مبلغ ${formatNumber(pkg.investment_amount)} ريال`
+      ? `مرحباً، أريد إرسال إيصال التحويل للباقة رقم ${pkg.package_number} - مبلغ ${formatNumber(pkg.investment_amount)} ريال${customerIdText}`
       : "مرحباً، أريد إرسال إيصال التحويل";
     window.open(`https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  const handleTelegramReceipt = () => {
+  const handleTelegramReceipt = async () => {
+    await createSubscriptionRequest();
     // Direct to T.me/aljeil
     window.open("https://t.me/aljeil", "_blank");
   };

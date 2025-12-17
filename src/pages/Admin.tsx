@@ -3,18 +3,19 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Package, CreditCard, MessageSquare, Settings, Users, FileText, Home } from "lucide-react";
+import { Package, CreditCard, MessageSquare, Settings, Users, FileText, Home, UserPlus } from "lucide-react";
 import AdminPackages from "@/components/admin/AdminPackages";
 import AdminPaymentMethods from "@/components/admin/AdminPaymentMethods";
 import AdminComments from "@/components/admin/AdminComments";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminInvestors from "@/components/admin/AdminInvestors";
 import AdminSubscriptionPolicy from "@/components/admin/AdminSubscriptionPolicy";
+import AdminNewCustomers from "@/components/admin/AdminNewCustomers";
 
 const Admin = () => {
   const { user, isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("investors");
+  const [activeTab, setActiveTab] = useState("new-customers");
 
   useEffect(() => {
     if (!isLoading && (!user || !isAdmin)) {
@@ -51,7 +52,11 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" dir="rtl">
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsList className="grid w-full grid-cols-7 mb-8">
+            <TabsTrigger value="new-customers" className="flex items-center gap-2">
+              <UserPlus className="w-4 h-4" />
+              <span className="hidden sm:inline">العملاء الجدد</span>
+            </TabsTrigger>
             <TabsTrigger value="investors" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">المستثمرين</span>
@@ -77,6 +82,10 @@ const Admin = () => {
               <span className="hidden sm:inline">الإعدادات</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="new-customers">
+            <AdminNewCustomers />
+          </TabsContent>
 
           <TabsContent value="investors">
             <AdminInvestors />

@@ -20,8 +20,10 @@ import {
   TrendingUp,
   CheckCircle2,
   XCircle,
-  Eye
+  Eye,
+  Hash
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface Investor {
   id: string;
@@ -39,6 +41,16 @@ interface Investor {
   is_active: boolean;
   email: string | null;
   notes: string | null;
+  linked_customer_id: string | null;
+}
+
+interface CustomerProfile {
+  id: string;
+  user_id: string;
+  customer_id: string | null;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
 }
 
 interface InvestorFee {
@@ -61,6 +73,7 @@ const AdminInvestors = () => {
   const { toast } = useToast();
   const [investors, setInvestors] = useState<Investor[]>([]);
   const [filteredInvestors, setFilteredInvestors] = useState<Investor[]>([]);
+  const [customers, setCustomers] = useState<CustomerProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -69,6 +82,8 @@ const AdminInvestors = () => {
   const [investorFees, setInvestorFees] = useState<InvestorFee[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFeeTypes, setSelectedFeeTypes] = useState<string[]>([]);
+  const [linkedCustomerId, setLinkedCustomerId] = useState("");
+  const [foundCustomer, setFoundCustomer] = useState<CustomerProfile | null>(null);
   
   const [formData, setFormData] = useState({
     full_name: "",
@@ -90,16 +105,45 @@ const AdminInvestors = () => {
 
   useEffect(() => {
     fetchInvestors();
+    fetchCustomers();
   }, []);
 
   useEffect(() => {
     const filtered = investors.filter(inv => 
       inv.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (inv.phone && inv.phone.includes(searchTerm)) ||
-      (inv.email && inv.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      (inv.email && inv.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (inv.linked_customer_id && inv.linked_customer_id.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredInvestors(filtered);
   }, [searchTerm, investors]);
+
+  const fetchCustomers = async () => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*");
+    
+    if (data) {
+      setCustomers(data);
+    }
+  };
+
+  const lookupCustomer = (customerId: string) => {
+    const customer = customers.find(c => c.customer_id?.toLowerCase() === customerId.toLowerCase());
+    if (customer) {
+      setFoundCustomer(customer);
+      setFormData(prev => ({
+        ...prev,
+        full_name: customer.full_name || prev.full_name,
+        email: customer.email || prev.email,
+        phone: customer.phone || prev.phone
+      }));
+      toast({ title: "تم العثور على العميل", description: `تم ملء بيانات العميل: ${customer.full_name}` });
+    } else {
+      setFoundCustomer(null);
+      toast({ title: "غير موجود", description: "لم يتم العثور على عميل بهذا الرقم", variant: "destructive" });
+    }
+  };
 
   const fetchInvestors = async () => {
     const { data, error } = await supabase
@@ -142,7 +186,8 @@ const AdminInvestors = () => {
       is_active: formData.is_active,
       email: formData.email || null,
       notes: formData.notes || null,
-      total_accumulated_profit: formData.is_previous_subscriber ? parseFloat(formData.previous_accumulated_profit) || 0 : 0
+      total_accumulated_profit: formData.is_previous_subscriber ? parseFloat(formData.previous_accumulated_profit) || 0 : 0,
+      linked_customer_id: linkedCustomerId || null
     };
 
     if (editingInvestor) {
@@ -252,6 +297,12 @@ const AdminInvestors = () => {
       previous_accumulated_profit: investor.total_accumulated_profit.toString()
     });
     
+    setLinkedCustomerId(investor.linked_customer_id || "");
+    if (investor.linked_customer_id) {
+      const customer = customers.find(c => c.customer_id === investor.linked_customer_id);
+      setFoundCustomer(customer || null);
+    }
+    
     await fetchInvestorFees(investor.id);
     setSelectedFeeTypes(investorFees.map(f => f.fee_type));
     setIsDialogOpen(true);
@@ -310,6 +361,8 @@ const AdminInvestors = () => {
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
     setInvestorFees([]);
+    setLinkedCustomerId("");
+    setFoundCustomer(null);
   };
 
   const formatNumber = (num: number) => num.toLocaleString("ar-SA");
@@ -391,6 +444,32 @@ const AdminInvestors = () => {
               <DialogTitle>{editingInvestor ? "تعديل بيانات المستثمر" : "إضافة مستثمر جديد"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Customer ID Lookup */}
+              <div className="bg-primary/10 rounded-lg p-4 border border-primary/30">
+                <Label className="text-primary font-bold">ربط بحساب عميل (اختياري)</Label>
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    placeholder="أدخل رقم العميل مثل GI-0001"
+                    value={linkedCustomerId}
+                    onChange={(e) => setLinkedCustomerId(e.target.value.toUpperCase())}
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => lookupCustomer(linkedCustomerId)}
+                    disabled={!linkedCustomerId}
+                  >
+                    بحث
+                  </Button>
+                </div>
+                {foundCustomer && (
+                  <div className="mt-2 p-2 bg-green-500/10 rounded border border-green-500/30 text-green-600 text-sm">
+                    ✓ تم العثور على: {foundCustomer.full_name} ({foundCustomer.email})
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>الاسم الكامل *</Label>
