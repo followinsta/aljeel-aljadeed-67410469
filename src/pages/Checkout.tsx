@@ -6,7 +6,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
 import { 
   ArrowLeft, 
   TrendingUp, 
@@ -117,34 +116,11 @@ const Checkout = () => {
     setLoading(false);
   };
 
-  const createSubscriptionRequest = async () => {
-    if (!user || !pkg) return;
-
-    const { error } = await supabase
-      .from("subscription_requests")
-      .insert({
-        user_id: user.id,
-        customer_id: userProfile?.customer_id,
-        full_name: userProfile?.full_name || user.email || "مجهول",
-        email: userProfile?.email || user.email,
-        phone: userProfile?.phone,
-        package_id: pkg.id,
-        package_name: pkg.name || `باقة رقم ${pkg.package_number}`,
-        package_amount: pkg.investment_amount,
-        status: "pending"
-      });
-
-    if (!error) {
-      toast.success("تم إرسال طلب الاشتراك بنجاح");
-    }
-  };
-
   const formatNumber = (num: number) => {
     return num.toLocaleString("ar-SA");
   };
 
-  const handleWhatsAppReceipt = async () => {
-    await createSubscriptionRequest();
+  const handleWhatsAppReceipt = () => {
     const whatsappNumber = settings.whatsapp_number || "966545189624";
     // Remove any non-digit characters
     const cleanNumber = whatsappNumber.replace(/[^\d]/g, '');
@@ -155,8 +131,7 @@ const Checkout = () => {
     window.open(`https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  const handleTelegramReceipt = async () => {
-    await createSubscriptionRequest();
+  const handleTelegramReceipt = () => {
     // Direct to T.me/aljeil
     window.open("https://t.me/aljeil", "_blank");
   };
