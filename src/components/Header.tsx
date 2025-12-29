@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Menu, X, TrendingUp, LogIn, LogOut, User, FileText, BarChart3 } from "lucide-react";
+import { Menu, X, TrendingUp, LogIn, LogOut, User, FileText, BarChart3, MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
@@ -59,6 +59,12 @@ const Header = () => {
               </a>
             ))}
             <Link
+              to="/testimonials"
+              className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
+            >
+              آراء العملاء
+            </Link>
+            <Link
               to="/subscription-policy"
               className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
             >
@@ -86,6 +92,12 @@ const Header = () => {
                     </Button>
                   </Link>
                 )}
+                <Link to="/profile">
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <User className="w-4 h-4" />
+                    بروفايلي
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-2">
                   <LogOut className="w-4 h-4" />
                   خروج
@@ -126,6 +138,13 @@ const Header = () => {
               </a>
             ))}
             <Link
+              to="/testimonials"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium py-2"
+            >
+              آراء العملاء
+            </Link>
+            <Link
               to="/subscription-policy"
               onClick={() => setIsMenuOpen(false)}
               className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium py-2"
@@ -150,6 +169,12 @@ const Header = () => {
                     </Button>
                   </Link>
                 )}
+                <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full gap-2 mt-2">
+                    <User className="w-4 h-4" />
+                    بروفايلي
+                  </Button>
+                </Link>
                 <Button variant="ghost" onClick={handleSignOut} className="w-full gap-2 mt-2">
                   <LogOut className="w-4 h-4" />
                   تسجيل الخروج
