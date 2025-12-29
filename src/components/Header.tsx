@@ -95,7 +95,7 @@ const Header = () => {
                 <Link to="/profile">
                   <Button variant="ghost" size="sm" className="gap-2">
                     <User className="w-4 h-4" />
-                    بروفايلي
+                    الملف الشخصي
                   </Button>
                 </Link>
                 <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-2">
@@ -172,7 +172,7 @@ const Header = () => {
                 <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" className="w-full gap-2 mt-2">
                     <User className="w-4 h-4" />
-                    بروفايلي
+                    الملف الشخصي
                   </Button>
                 </Link>
                 <Button variant="ghost" onClick={handleSignOut} className="w-full gap-2 mt-2">
