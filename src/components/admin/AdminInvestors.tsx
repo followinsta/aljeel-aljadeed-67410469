@@ -172,6 +172,9 @@ const AdminInvestors = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // الأرباح السابقة يتم تحديدها يدوياً فقط من المدير
+    const previousProfit = formData.is_previous_subscriber ? parseFloat(formData.previous_accumulated_profit) || 0 : 0;
+    
     const investorData = {
       full_name: formData.full_name,
       phone: formData.phone || null,
@@ -186,7 +189,7 @@ const AdminInvestors = () => {
       is_active: formData.is_active,
       email: formData.email || null,
       notes: formData.notes || null,
-      total_accumulated_profit: formData.is_previous_subscriber ? parseFloat(formData.previous_accumulated_profit) || 0 : 0,
+      total_accumulated_profit: previousProfit,
       linked_customer_id: linkedCustomerId || null
     };
 
@@ -227,10 +230,8 @@ const AdminInvestors = () => {
         await supabase.from("investor_fees").insert(feesToInsert);
       }
 
-      // Generate profit history if previous subscriber
-      if (formData.is_previous_subscriber && data) {
-        await generateProfitHistory(data.id, formData.subscription_start_date, parseFloat(formData.daily_profit));
-      }
+      // إنشاء سجل أرباح للمشترك السابق - الأرباح السابقة قيمة ثابتة فقط
+      // لا نقوم بحسابها تلقائياً
 
       toast({ title: "تمت الإضافة", description: "تم إضافة المستثمر بنجاح" });
     }
@@ -240,27 +241,7 @@ const AdminInvestors = () => {
     fetchInvestors();
   };
 
-  const generateProfitHistory = async (investorId: string, startDate: string, dailyProfit: number) => {
-    const start = new Date(startDate);
-    const today = new Date();
-    const records = [];
-    let cumulativeProfit = 0;
-
-    for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
-      cumulativeProfit += dailyProfit;
-      records.push({
-        investor_id: investorId,
-        profit_amount: dailyProfit,
-        profit_date: d.toISOString().split("T")[0],
-        cumulative_profit: cumulativeProfit
-      });
-    }
-
-    if (records.length > 0) {
-      await supabase.from("investor_profit_history").insert(records);
-      await supabase.from("investors").update({ total_accumulated_profit: cumulativeProfit }).eq("id", investorId);
-    }
-  };
+  // تم إزالة generateProfitHistory لأن الأرباح السابقة تُحدد يدوياً فقط
 
   const updateInvestorFees = async (investorId: string) => {
     // Delete existing fees
@@ -572,17 +553,19 @@ const AdminInvestors = () => {
                     checked={formData.is_previous_subscriber}
                     onCheckedChange={(checked) => setFormData({ ...formData, is_previous_subscriber: !!checked })}
                   />
-                  <Label>مشترك سابق (سيتم إنشاء سجل أرباح من تاريخ البداية)</Label>
+                  <Label>مشترك سابق (لديه أرباح متراكمة سابقة)</Label>
                 </div>
               )}
 
-              {formData.is_previous_subscriber && (
-                <div>
-                  <Label>الأرباح المتراكمة الحالية</Label>
+              {(formData.is_previous_subscriber || editingInvestor) && (
+                <div className="bg-primary/10 p-4 rounded-lg border border-primary/30">
+                  <Label className="text-primary font-bold">الأرباح المتراكمة السابقة</Label>
+                  <p className="text-xs text-muted-foreground mb-2">هذه القيمة تُحدد يدوياً ولا تُحسب تلقائياً</p>
                   <Input
                     type="number"
                     value={formData.previous_accumulated_profit}
                     onChange={(e) => setFormData({ ...formData, previous_accumulated_profit: e.target.value })}
+                    placeholder="0"
                   />
                 </div>
               )}

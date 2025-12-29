@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Quote, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 
 interface Comment {
@@ -73,9 +74,15 @@ const TestimonialsSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             ماذا يقول <span className="text-gradient-gold">المستثمرون</span> عنا
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
             آلاف المستثمرين حققوا أحلامهم معنا. اقرأ تجاربهم الحقيقية
           </p>
+          <Link to="/testimonials">
+            <Button variant="outline" className="gap-2">
+              <ExternalLink className="w-4 h-4" />
+              عرض جميع الآراء
+            </Button>
+          </Link>
         </div>
 
         {/* Navigation Buttons */}

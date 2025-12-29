@@ -155,7 +155,10 @@ const InvestorDashboard = () => {
   const daysPassed = calculateDaysPassed();
   const daysRemaining = calculateDaysRemaining();
   const totalExpectedProfit = investor.daily_profit * investor.subscription_duration_days;
-  const currentProfit = investor.total_accumulated_profit;
+  
+  // الأرباح المتراكمة = الأرباح السابقة (المحددة يدوياً) + الأرباح اليومية * الأيام المنقضية
+  const calculatedProfit = investor.daily_profit * daysPassed;
+  const currentProfit = investor.total_accumulated_profit + calculatedProfit;
 
   return (
     <main className="min-h-screen bg-background">
@@ -252,9 +255,19 @@ const InvestorDashboard = () => {
                   <span className="text-muted-foreground">الأيام المنقضية</span>
                   <span className="font-medium">{daysPassed} يوم</span>
                 </div>
+                {investor.total_accumulated_profit > 0 && (
+                  <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                    <span className="text-muted-foreground">الأرباح السابقة</span>
+                    <span className="font-medium text-accent">{formatNumber(investor.total_accumulated_profit)} ريال</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                  <span className="text-muted-foreground">أرباح الفترة الحالية</span>
+                  <span className="font-medium text-accent">{formatNumber(calculatedProfit)} ريال</span>
+                </div>
                 <div className="flex justify-between items-center p-3 bg-gradient-gold/10 rounded-lg border border-primary/30">
                   <span className="text-foreground font-medium">إجمالي الربح المتوقع</span>
-                  <span className="font-bold text-primary">{formatNumber(totalExpectedProfit)} ريال</span>
+                  <span className="font-bold text-primary">{formatNumber(totalExpectedProfit + investor.total_accumulated_profit)} ريال</span>
                 </div>
               </CardContent>
             </Card>
