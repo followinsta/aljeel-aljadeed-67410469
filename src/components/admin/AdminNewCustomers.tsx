@@ -56,8 +56,36 @@ const AdminNewCustomers = () => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'requests' | 'customers'>('requests');
 
+  const [newNotifications, setNewNotifications] = useState<CustomerProfile[]>([]);
+
   useEffect(() => {
     fetchData();
+
+    // Subscribe to realtime new customer registrations
+    const channel = supabase
+      .channel('new-customers')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'profiles',
+        },
+        (payload) => {
+          const newCustomer = payload.new as CustomerProfile;
+          setNewNotifications(prev => [newCustomer, ...prev]);
+          setCustomers(prev => [newCustomer, ...prev]);
+          toast({
+            title: "🔔 عميل جديد!",
+            description: `${newCustomer.full_name || 'عميل جديد'} - ${newCustomer.customer_id || ''} - ${newCustomer.phone || 'بدون هاتف'}`,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchData = async () => {
