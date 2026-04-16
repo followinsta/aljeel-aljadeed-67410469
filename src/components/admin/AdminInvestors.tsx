@@ -286,8 +286,8 @@ const AdminInvestors = () => {
       setFoundCustomer(customer || null);
     }
     
-    await fetchInvestorFees(investor.id);
-    setSelectedFeeTypes(investorFees.map(f => f.fee_type));
+    const fees = await fetchInvestorFees(investor.id);
+    setSelectedFeeTypes(fees.map(f => f.fee_type));
     setIsDialogOpen(true);
   };
 
