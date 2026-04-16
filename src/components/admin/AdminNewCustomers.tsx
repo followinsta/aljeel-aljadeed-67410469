@@ -231,7 +231,47 @@ const AdminNewCustomers = () => {
         </Card>
       </div>
 
-      {/* Tabs */}
+      {/* New Registration Notifications */}
+      {newNotifications.length > 0 && (
+        <Card className="bg-primary/5 border-primary/30">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Bell className="w-5 h-5 text-primary" />
+                إشعارات التسجيل الجديدة ({newNotifications.length})
+              </CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => setNewNotifications([])}>
+                <X className="w-4 h-4" />
+                مسح الكل
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {newNotifications.map((notif, idx) => (
+              <div key={notif.id || idx} className="flex flex-wrap items-center gap-3 p-3 bg-background rounded-lg border border-border">
+                <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
+                  <Hash className="w-3 h-3" />
+                  {notif.customer_id || 'جاري التوليد...'}
+                </Badge>
+                <span className="flex items-center gap-1 text-sm font-medium">
+                  <User className="w-3 h-3 text-muted-foreground" />
+                  {notif.full_name || 'بدون اسم'}
+                </span>
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Mail className="w-3 h-3" />
+                  {notif.email || 'بدون بريد'}
+                </span>
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Phone className="w-3 h-3" />
+                  {notif.phone || 'بدون هاتف'}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+
       <div className="flex gap-2 border-b border-border">
         <button
           onClick={() => setActiveTab('requests')}
