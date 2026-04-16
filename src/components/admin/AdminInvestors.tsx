@@ -160,15 +160,15 @@ const AdminInvestors = () => {
     setIsLoading(false);
   };
 
-  const fetchInvestorFees = async (investorId: string) => {
+  const fetchInvestorFees = async (investorId: string): Promise<InvestorFee[]> => {
     const { data } = await supabase
       .from("investor_fees")
       .select("*")
       .eq("investor_id", investorId);
     
-    if (data) {
-      setInvestorFees(data);
-    }
+    const fees = data || [];
+    setInvestorFees(fees);
+    return fees;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -246,6 +246,12 @@ const AdminInvestors = () => {
   // تم إزالة generateProfitHistory لأن الأرباح السابقة تُحدد يدوياً فقط
 
   const updateInvestorFees = async (investorId: string) => {
+    // Fetch current fees to preserve is_paid status
+    const { data: currentFees } = await supabase
+      .from("investor_fees")
+      .select("*")
+      .eq("investor_id", investorId);
+    
     // Delete existing fees
     await supabase.from("investor_fees").delete().eq("investor_id", investorId);
     
@@ -254,7 +260,7 @@ const AdminInvestors = () => {
       const feesToInsert = selectedFeeTypes.map(feeType => ({
         investor_id: investorId,
         fee_type: feeType,
-        is_paid: investorFees.find(f => f.fee_type === feeType)?.is_paid || false
+        is_paid: currentFees?.find(f => f.fee_type === feeType)?.is_paid || false
       }));
       await supabase.from("investor_fees").insert(feesToInsert);
     }
@@ -286,8 +292,8 @@ const AdminInvestors = () => {
       setFoundCustomer(customer || null);
     }
     
-    await fetchInvestorFees(investor.id);
-    setSelectedFeeTypes(investorFees.map(f => f.fee_type));
+    const fees = await fetchInvestorFees(investor.id);
+    setSelectedFeeTypes(fees.map(f => f.fee_type));
     setIsDialogOpen(true);
   };
 
