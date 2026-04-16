@@ -246,6 +246,12 @@ const AdminInvestors = () => {
   // تم إزالة generateProfitHistory لأن الأرباح السابقة تُحدد يدوياً فقط
 
   const updateInvestorFees = async (investorId: string) => {
+    // Fetch current fees to preserve is_paid status
+    const { data: currentFees } = await supabase
+      .from("investor_fees")
+      .select("*")
+      .eq("investor_id", investorId);
+    
     // Delete existing fees
     await supabase.from("investor_fees").delete().eq("investor_id", investorId);
     
@@ -254,7 +260,7 @@ const AdminInvestors = () => {
       const feesToInsert = selectedFeeTypes.map(feeType => ({
         investor_id: investorId,
         fee_type: feeType,
-        is_paid: investorFees.find(f => f.fee_type === feeType)?.is_paid || false
+        is_paid: currentFees?.find(f => f.fee_type === feeType)?.is_paid || false
       }));
       await supabase.from("investor_fees").insert(feesToInsert);
     }
