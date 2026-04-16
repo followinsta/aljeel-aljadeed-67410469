@@ -160,15 +160,15 @@ const AdminInvestors = () => {
     setIsLoading(false);
   };
 
-  const fetchInvestorFees = async (investorId: string) => {
+  const fetchInvestorFees = async (investorId: string): Promise<InvestorFee[]> => {
     const { data } = await supabase
       .from("investor_fees")
       .select("*")
       .eq("investor_id", investorId);
     
-    if (data) {
-      setInvestorFees(data);
-    }
+    const fees = data || [];
+    setInvestorFees(fees);
+    return fees;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
