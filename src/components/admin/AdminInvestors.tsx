@@ -356,6 +356,8 @@ const AdminInvestors = () => {
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
+    setCustomFees([]);
+    setNewCustomFee("");
     setInvestorFees([]);
     setLinkedCustomerId("");
     setFoundCustomer(null);
