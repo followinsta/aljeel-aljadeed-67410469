@@ -85,6 +85,8 @@ const AdminInvestors = () => {
   const [investorFees, setInvestorFees] = useState<InvestorFee[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFeeTypes, setSelectedFeeTypes] = useState<string[]>([]);
+  const [customFees, setCustomFees] = useState<string[]>([]);
+  const [newCustomFee, setNewCustomFee] = useState("");
   const [linkedCustomerId, setLinkedCustomerId] = useState("");
   const [foundCustomer, setFoundCustomer] = useState<CustomerProfile | null>(null);
   
