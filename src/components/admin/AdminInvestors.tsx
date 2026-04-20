@@ -259,9 +259,10 @@ const AdminInvestors = () => {
     // Delete existing fees
     await supabase.from("investor_fees").delete().eq("investor_id", investorId);
     
-    // Insert new fees
-    if (selectedFeeTypes.length > 0) {
-      const feesToInsert = selectedFeeTypes.map(feeType => ({
+    // Insert new fees (selected + custom)
+    const allFees = [...selectedFeeTypes, ...customFees];
+    if (allFees.length > 0) {
+      const feesToInsert = allFees.map(feeType => ({
         investor_id: investorId,
         fee_type: feeType,
         is_paid: currentFees?.find(f => f.fee_type === feeType)?.is_paid || false
