@@ -225,9 +225,10 @@ const AdminInvestors = () => {
         return;
       }
 
-      // Add selected fees
-      if (selectedFeeTypes.length > 0 && data) {
-        const feesToInsert = selectedFeeTypes.map(feeType => ({
+      // Add selected fees + custom fees
+      const allFees = [...selectedFeeTypes, ...customFees];
+      if (allFees.length > 0 && data) {
+        const feesToInsert = allFees.map(feeType => ({
           investor_id: data.id,
           fee_type: feeType,
           is_paid: false
