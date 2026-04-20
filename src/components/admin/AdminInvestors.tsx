@@ -298,7 +298,9 @@ const AdminInvestors = () => {
     }
     
     const fees = await fetchInvestorFees(investor.id);
-    setSelectedFeeTypes(fees.map(f => f.fee_type));
+    const feeTypes = fees.map(f => f.fee_type);
+    setSelectedFeeTypes(feeTypes.filter(t => FEE_TYPES.includes(t)));
+    setCustomFees(feeTypes.filter(t => !FEE_TYPES.includes(t)));
     setIsDialogOpen(true);
   };
 
