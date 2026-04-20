@@ -68,7 +68,8 @@ const FEE_TYPES = [
   "رسوم إدارة المحفظة",
   "رسوم أتعاب الموظف والمعاملات الأدارية",
   "رسوم عدم النشاط",
-  "رسوم منصة الوسيط"
+  "رسوم منصة الوسيط",
+  "الرسوم الضريبية"
 ];
 
 const AdminInvestors = () => {
@@ -84,6 +85,8 @@ const AdminInvestors = () => {
   const [investorFees, setInvestorFees] = useState<InvestorFee[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFeeTypes, setSelectedFeeTypes] = useState<string[]>([]);
+  const [customFees, setCustomFees] = useState<string[]>([]);
+  const [newCustomFee, setNewCustomFee] = useState("");
   const [linkedCustomerId, setLinkedCustomerId] = useState("");
   const [foundCustomer, setFoundCustomer] = useState<CustomerProfile | null>(null);
   
@@ -222,9 +225,10 @@ const AdminInvestors = () => {
         return;
       }
 
-      // Add selected fees
-      if (selectedFeeTypes.length > 0 && data) {
-        const feesToInsert = selectedFeeTypes.map(feeType => ({
+      // Add selected fees + custom fees
+      const allFees = [...selectedFeeTypes, ...customFees];
+      if (allFees.length > 0 && data) {
+        const feesToInsert = allFees.map(feeType => ({
           investor_id: data.id,
           fee_type: feeType,
           is_paid: false
@@ -255,9 +259,10 @@ const AdminInvestors = () => {
     // Delete existing fees
     await supabase.from("investor_fees").delete().eq("investor_id", investorId);
     
-    // Insert new fees
-    if (selectedFeeTypes.length > 0) {
-      const feesToInsert = selectedFeeTypes.map(feeType => ({
+    // Insert new fees (selected + custom)
+    const allFees = [...selectedFeeTypes, ...customFees];
+    if (allFees.length > 0) {
+      const feesToInsert = allFees.map(feeType => ({
         investor_id: investorId,
         fee_type: feeType,
         is_paid: currentFees?.find(f => f.fee_type === feeType)?.is_paid || false
@@ -293,7 +298,9 @@ const AdminInvestors = () => {
     }
     
     const fees = await fetchInvestorFees(investor.id);
-    setSelectedFeeTypes(fees.map(f => f.fee_type));
+    const feeTypes = fees.map(f => f.fee_type);
+    setSelectedFeeTypes(feeTypes.filter(t => FEE_TYPES.includes(t)));
+    setCustomFees(feeTypes.filter(t => !FEE_TYPES.includes(t)));
     setIsDialogOpen(true);
   };
 
@@ -349,6 +356,8 @@ const AdminInvestors = () => {
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
+    setCustomFees([]);
+    setNewCustomFee("");
     setInvestorFees([]);
     setLinkedCustomerId("");
     setFoundCustomer(null);
@@ -597,6 +606,59 @@ const AdminInvestors = () => {
                       <Label className="font-normal">{feeType}</Label>
                     </div>
                   ))}
+                </div>
+
+                {/* Custom Fees */}
+                <div className="mt-4 p-3 bg-secondary/30 rounded-lg space-y-3">
+                  <Label className="font-bold">رسوم مخصصة (اكتب الرسم بنفسك)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="اكتب اسم الرسم..."
+                      value={newCustomFee}
+                      onChange={(e) => setNewCustomFee(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const trimmed = newCustomFee.trim();
+                          if (trimmed && !customFees.includes(trimmed) && !FEE_TYPES.includes(trimmed)) {
+                            setCustomFees([...customFees, trimmed]);
+                            setNewCustomFee("");
+                          }
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        const trimmed = newCustomFee.trim();
+                        if (trimmed && !customFees.includes(trimmed) && !FEE_TYPES.includes(trimmed)) {
+                          setCustomFees([...customFees, trimmed]);
+                          setNewCustomFee("");
+                        }
+                      }}
+                    >
+                      <Plus className="w-4 h-4" />
+                      إضافة
+                    </Button>
+                  </div>
+                  {customFees.length > 0 && (
+                    <div className="space-y-2">
+                      {customFees.map((fee) => (
+                        <div key={fee} className="flex items-center justify-between p-2 bg-background rounded border border-border">
+                          <span className="text-sm">{fee}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setCustomFees(customFees.filter(f => f !== fee))}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
