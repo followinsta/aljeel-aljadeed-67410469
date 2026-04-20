@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Package, CreditCard, MessageSquare, Settings, Users, FileText, Home, UserPlus } from "lucide-react";
-import AdminPackages from "@/components/admin/AdminPackages";
-import AdminPaymentMethods from "@/components/admin/AdminPaymentMethods";
-import AdminComments from "@/components/admin/AdminComments";
-import AdminSettings from "@/components/admin/AdminSettings";
-import AdminInvestors from "@/components/admin/AdminInvestors";
-import AdminSubscriptionPolicy from "@/components/admin/AdminSubscriptionPolicy";
-import AdminNewCustomers from "@/components/admin/AdminNewCustomers";
+
+const AdminPackages = lazy(() => import("@/components/admin/AdminPackages"));
+const AdminPaymentMethods = lazy(() => import("@/components/admin/AdminPaymentMethods"));
+const AdminComments = lazy(() => import("@/components/admin/AdminComments"));
+const AdminSettings = lazy(() => import("@/components/admin/AdminSettings"));
+const AdminInvestors = lazy(() => import("@/components/admin/AdminInvestors"));
+const AdminSubscriptionPolicy = lazy(() => import("@/components/admin/AdminSubscriptionPolicy"));
+const AdminNewCustomers = lazy(() => import("@/components/admin/AdminNewCustomers"));
+
+const TabFallback = () => (
+  <div className="text-center py-12 text-muted-foreground">جاري التحميل...</div>
+);
 
 const Admin = () => {
   const { user, isAdmin, isLoading } = useAuth();
@@ -83,33 +88,29 @@ const Admin = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="new-customers">
-            <AdminNewCustomers />
-          </TabsContent>
-
-          <TabsContent value="investors">
-            <AdminInvestors />
-          </TabsContent>
-
-          <TabsContent value="packages">
-            <AdminPackages />
-          </TabsContent>
-
-          <TabsContent value="payments">
-            <AdminPaymentMethods />
-          </TabsContent>
-
-          <TabsContent value="comments">
-            <AdminComments />
-          </TabsContent>
-
-          <TabsContent value="policy">
-            <AdminSubscriptionPolicy />
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <AdminSettings />
-          </TabsContent>
+          <Suspense fallback={<TabFallback />}>
+            {activeTab === "new-customers" && (
+              <TabsContent value="new-customers" forceMount><AdminNewCustomers /></TabsContent>
+            )}
+            {activeTab === "investors" && (
+              <TabsContent value="investors" forceMount><AdminInvestors /></TabsContent>
+            )}
+            {activeTab === "packages" && (
+              <TabsContent value="packages" forceMount><AdminPackages /></TabsContent>
+            )}
+            {activeTab === "payments" && (
+              <TabsContent value="payments" forceMount><AdminPaymentMethods /></TabsContent>
+            )}
+            {activeTab === "comments" && (
+              <TabsContent value="comments" forceMount><AdminComments /></TabsContent>
+            )}
+            {activeTab === "policy" && (
+              <TabsContent value="policy" forceMount><AdminSubscriptionPolicy /></TabsContent>
+            )}
+            {activeTab === "settings" && (
+              <TabsContent value="settings" forceMount><AdminSettings /></TabsContent>
+            )}
+          </Suspense>
         </Tabs>
       </div>
     </div>
