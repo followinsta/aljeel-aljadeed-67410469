@@ -607,6 +607,59 @@ const AdminInvestors = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Custom Fees */}
+                <div className="mt-4 p-3 bg-secondary/30 rounded-lg space-y-3">
+                  <Label className="font-bold">رسوم مخصصة (اكتب الرسم بنفسك)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="اكتب اسم الرسم..."
+                      value={newCustomFee}
+                      onChange={(e) => setNewCustomFee(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const trimmed = newCustomFee.trim();
+                          if (trimmed && !customFees.includes(trimmed) && !FEE_TYPES.includes(trimmed)) {
+                            setCustomFees([...customFees, trimmed]);
+                            setNewCustomFee("");
+                          }
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        const trimmed = newCustomFee.trim();
+                        if (trimmed && !customFees.includes(trimmed) && !FEE_TYPES.includes(trimmed)) {
+                          setCustomFees([...customFees, trimmed]);
+                          setNewCustomFee("");
+                        }
+                      }}
+                    >
+                      <Plus className="w-4 h-4" />
+                      إضافة
+                    </Button>
+                  </div>
+                  {customFees.length > 0 && (
+                    <div className="space-y-2">
+                      {customFees.map((fee) => (
+                        <div key={fee} className="flex items-center justify-between p-2 bg-background rounded border border-border">
+                          <span className="text-sm">{fee}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setCustomFees(customFees.filter(f => f !== fee))}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
