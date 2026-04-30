@@ -3,10 +3,11 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Package, CreditCard, MessageSquare, Settings, Users, FileText, Home, UserPlus } from "lucide-react";
+import { Package, CreditCard, MessageSquare, Settings, Users, FileText, Home, UserPlus, Receipt } from "lucide-react";
 
 const AdminPackages = lazy(() => import("@/components/admin/AdminPackages"));
 const AdminPaymentMethods = lazy(() => import("@/components/admin/AdminPaymentMethods"));
+const AdminPaymentReceipts = lazy(() => import("@/components/admin/AdminPaymentReceipts"));
 const AdminComments = lazy(() => import("@/components/admin/AdminComments"));
 const AdminSettings = lazy(() => import("@/components/admin/AdminSettings"));
 const AdminInvestors = lazy(() => import("@/components/admin/AdminInvestors"));
@@ -57,7 +58,7 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" dir="rtl">
-          <TabsList className="grid w-full grid-cols-7 mb-8">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 mb-8 h-auto">
             <TabsTrigger value="new-customers" className="flex items-center gap-2">
               <UserPlus className="w-4 h-4" />
               <span className="hidden sm:inline">العملاء الجدد</span>
@@ -65,6 +66,10 @@ const Admin = () => {
             <TabsTrigger value="investors" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">المستثمرين</span>
+            </TabsTrigger>
+            <TabsTrigger value="receipts" className="flex items-center gap-2">
+              <Receipt className="w-4 h-4" />
+              <span className="hidden sm:inline">إيصالات التحويل</span>
             </TabsTrigger>
             <TabsTrigger value="packages" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
@@ -94,6 +99,9 @@ const Admin = () => {
             )}
             {activeTab === "investors" && (
               <TabsContent value="investors" forceMount><AdminInvestors /></TabsContent>
+            )}
+            {activeTab === "receipts" && (
+              <TabsContent value="receipts" forceMount><AdminPaymentReceipts /></TabsContent>
             )}
             {activeTab === "packages" && (
               <TabsContent value="packages" forceMount><AdminPackages /></TabsContent>

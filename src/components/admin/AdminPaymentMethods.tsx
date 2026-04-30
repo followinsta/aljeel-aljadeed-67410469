@@ -156,6 +156,8 @@ const AdminPaymentMethods = () => {
     switch (type) {
       case "bank_transfer":
         return "تحويل بنكي";
+      case "binance_usdt":
+        return "باينانس USDT (TRC-20)";
       case "whatsapp":
         return "واتساب";
       case "telegram":
@@ -200,6 +202,7 @@ const AdminPaymentMethods = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="bank_transfer">تحويل بنكي</SelectItem>
+                    <SelectItem value="binance_usdt">باينانس USDT (TRC-20)</SelectItem>
                     <SelectItem value="whatsapp">واتساب</SelectItem>
                     <SelectItem value="telegram">تلقرام</SelectItem>
                   </SelectContent>
@@ -249,6 +252,28 @@ const AdminPaymentMethods = () => {
                         setFormData({ ...formData, iban: e.target.value })
                       }
                       placeholder="SA0000000000000000000000"
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.method_type === "binance_usdt" && (
+                <>
+                  <div>
+                    <Label>اسم/الشبكة (مثال: Binance USDT TRC-20)</Label>
+                    <Input
+                      value={formData.bank_name}
+                      onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
+                      placeholder="Binance USDT (TRC-20)"
+                    />
+                  </div>
+                  <div>
+                    <Label>عنوان المحفظة (USDT Address)</Label>
+                    <Input
+                      value={formData.account_number}
+                      onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
+                      placeholder="TFQAqn3fYQjU5W7WWWomVFvv62asLwWsjR"
+                      className="font-mono text-xs"
                     />
                   </div>
                 </>
@@ -322,6 +347,12 @@ const AdminPaymentMethods = () => {
                         <p>{method.bank_name}</p>
                         <p>الحساب: {method.account_number}</p>
                         {method.iban && <p>IBAN: {method.iban}</p>}
+                      </div>
+                    )}
+                    {method.method_type === "binance_usdt" && (
+                      <div className="text-sm text-muted-foreground">
+                        <p>{method.bank_name}</p>
+                        <p className="font-mono text-xs break-all">العنوان: {method.account_number}</p>
                       </div>
                     )}
                     {method.method_type === "whatsapp" && (

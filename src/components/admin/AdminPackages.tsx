@@ -15,6 +15,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Package {
   id: string;
@@ -28,6 +35,7 @@ interface Package {
   image_url: string | null;
   description: string | null;
   name: string | null;
+  currency: string;
 }
 
 const AdminPackages = () => {
@@ -46,6 +54,7 @@ const AdminPackages = () => {
     image_url: "",
     description: "",
     name: "",
+    currency: "SAR",
   });
   const [uploading, setUploading] = useState(false);
 
@@ -106,6 +115,7 @@ const AdminPackages = () => {
       image_url: formData.image_url || null,
       description: formData.description || null,
       name: formData.name || null,
+      currency: formData.currency,
     };
 
     if (editingPackage) {
@@ -149,6 +159,7 @@ const AdminPackages = () => {
       image_url: pkg.image_url || "",
       description: pkg.description || "",
       name: pkg.name || "",
+      currency: pkg.currency || "SAR",
     });
     setIsDialogOpen(true);
   };
@@ -179,6 +190,7 @@ const AdminPackages = () => {
       image_url: "",
       description: "",
       name: "",
+      currency: "SAR",
     });
   };
 
@@ -231,32 +243,42 @@ const AdminPackages = () => {
                 </div>
               </div>
 
+              <div>
+                <Label>العملة</Label>
+                <Select
+                  value={formData.currency}
+                  onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SAR">الريال السعودي (SAR)</SelectItem>
+                    <SelectItem value="USD">الدولار الأمريكي (USD)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>مبلغ الاستثمار (ريال)</Label>
+                  <Label>مبلغ الاستثمار ({formData.currency === "USD" ? "دولار" : "ريال"})</Label>
                   <Input
                     type="number"
                     value={formData.investment_amount}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        investment_amount: parseFloat(e.target.value),
-                      })
+                      setFormData({ ...formData, investment_amount: parseFloat(e.target.value) })
                     }
                     required
                   />
                 </div>
                 <div>
-                  <Label>الربح اليومي (ريال)</Label>
+                  <Label>الربح اليومي ({formData.currency === "USD" ? "دولار" : "ريال"})</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={formData.daily_profit}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        daily_profit: parseFloat(e.target.value),
-                      })
+                      setFormData({ ...formData, daily_profit: parseFloat(e.target.value) })
                     }
                     required
                   />
@@ -363,10 +385,13 @@ const AdminPackages = () => {
                     {pkg.name || `باقة ${pkg.package_number}`}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    الاستثمار: {pkg.investment_amount.toLocaleString()} ريال |
-                    الربح اليومي: {pkg.daily_profit} ريال
+                    الاستثمار: {pkg.investment_amount.toLocaleString()} {pkg.currency === "USD" ? "دولار" : "ريال"} |
+                    الربح اليومي: {pkg.daily_profit} {pkg.currency === "USD" ? "دولار" : "ريال"}
                   </p>
                   <div className="flex gap-2 mt-1">
+                    <span className={`text-xs px-2 py-0.5 rounded ${pkg.currency === "USD" ? "bg-green-500/20 text-green-500" : "bg-blue-500/20 text-blue-500"}`}>
+                      {pkg.currency === "USD" ? "USD 💵" : "SAR 🇸🇦"}
+                    </span>
                     {pkg.is_business && (
                       <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
                         أعمال
