@@ -349,7 +349,12 @@ const AdminPaymentMethods = () => {
                         {method.iban && <p>IBAN: {method.iban}</p>}
                       </div>
                     )}
-                    {method.method_type === "whatsapp" && (
+                    {method.method_type === "binance_usdt" && (
+                      <div className="text-sm text-muted-foreground">
+                        <p>{method.bank_name}</p>
+                        <p className="font-mono text-xs break-all">العنوان: {method.account_number}</p>
+                      </div>
+                    )}
                       <p className="text-sm text-muted-foreground">
                         {method.whatsapp_number}
                       </p>
