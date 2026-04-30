@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp, Crown, Sparkles, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,12 +19,14 @@ interface Package {
   name: string | null;
   description: string | null;
   image_url: string | null;
+  currency: string;
 }
 
 const Packages = () => {
   const navigate = useNavigate();
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currency, setCurrency] = useState<"SAR" | "USD">("SAR");
 
   useEffect(() => {
     fetchPackages();
@@ -37,21 +40,22 @@ const Packages = () => {
       .order("package_number", { ascending: true });
 
     if (!error && data) {
-      setPackages(data);
+      setPackages(data as Package[]);
     }
     setLoading(false);
   };
 
-  const formatNumber = (num: number) => {
-    return num.toLocaleString("ar-SA");
-  };
+  const formatNumber = (num: number) => num.toLocaleString("ar-SA");
 
-  const regularPackages = packages.filter((p) => !p.is_business);
-  const businessPackages = packages.filter((p) => p.is_business);
+  const filtered = packages.filter((p) => (p.currency || "SAR") === currency);
+  const regularPackages = filtered.filter((p) => !p.is_business);
+  const businessPackages = filtered.filter((p) => p.is_business);
 
   const handleSubscribe = (pkg: Package) => {
     navigate(`/checkout/${pkg.id}`);
   };
+
+  const currencyLabel = currency === "USD" ? "دولار" : "ريال";
 
   if (loading) {
     return (
@@ -64,10 +68,9 @@ const Packages = () => {
   return (
     <main className="min-h-screen bg-background">
       <Header />
-      
+
       <section className="py-24 pt-32">
         <div className="container mx-auto px-4">
-          {/* Back button */}
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
@@ -77,8 +80,7 @@ const Packages = () => {
             العودة للرئيسية
           </Button>
 
-          {/* Section header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full mb-6">
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium">جميع باقات الاستثمار</span>
@@ -87,49 +89,68 @@ const Packages = () => {
               اختر <span className="text-gradient-gold">باقتك</span> المناسبة
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              باقات متنوعة تناسب جميع المستثمرين. ابدأ برأس مال صغير واحصل على أرباح يومية مضمونة
+              باقات متنوعة بعملتي الريال السعودي والدولار الأمريكي
             </p>
           </div>
 
-          {/* Regular Packages */}
-          {regularPackages.length > 0 && (
-            <>
-              <h2 className="text-2xl font-bold mb-8 text-center">باقات الاستثمار</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-16">
-                {regularPackages.map((pkg) => (
-                  <PackageCardDisplay
-                    key={pkg.id}
-                    pkg={pkg}
-                    onSubscribe={() => handleSubscribe(pkg)}
-                    formatNumber={formatNumber}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+          {/* Currency Tabs */}
+          <Tabs
+            value={currency}
+            onValueChange={(v) => setCurrency(v as "SAR" | "USD")}
+            className="w-full mb-10"
+            dir="rtl"
+          >
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+              <TabsTrigger value="SAR">الريال السعودي 🇸🇦</TabsTrigger>
+              <TabsTrigger value="USD">الدولار الأمريكي 💵</TabsTrigger>
+            </TabsList>
 
-          {/* Business Packages */}
-          {businessPackages.length > 0 && (
-            <>
-              <h2 className="text-2xl font-bold mb-8 text-center text-gradient-gold">باقات رجال الأعمال</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                {businessPackages.map((pkg) => (
-                  <PackageCardDisplay
-                    key={pkg.id}
-                    pkg={pkg}
-                    onSubscribe={() => handleSubscribe(pkg)}
-                    formatNumber={formatNumber}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+            <TabsContent value={currency} className="mt-10">
+              {regularPackages.length > 0 && (
+                <>
+                  <h2 className="text-2xl font-bold mb-8 text-center">باقات الاستثمار</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-16">
+                    {regularPackages.map((pkg) => (
+                      <PackageCardDisplay
+                        key={pkg.id}
+                        pkg={pkg}
+                        currencyLabel={currencyLabel}
+                        onSubscribe={() => handleSubscribe(pkg)}
+                        formatNumber={formatNumber}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
 
-          {packages.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground">لا توجد باقات متاحة حالياً</p>
-            </div>
-          )}
+              {businessPackages.length > 0 && (
+                <>
+                  <h2 className="text-2xl font-bold mb-8 text-center text-gradient-gold">
+                    باقات رجال الأعمال
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    {businessPackages.map((pkg) => (
+                      <PackageCardDisplay
+                        key={pkg.id}
+                        pkg={pkg}
+                        currencyLabel={currencyLabel}
+                        onSubscribe={() => handleSubscribe(pkg)}
+                        formatNumber={formatNumber}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {filtered.length === 0 && (
+                <div className="text-center py-16">
+                  <p className="text-muted-foreground">
+                    لا توجد باقات متاحة حالياً بعملة {currencyLabel}
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </section>
 
@@ -140,11 +161,12 @@ const Packages = () => {
 
 interface PackageCardDisplayProps {
   pkg: Package;
+  currencyLabel: string;
   onSubscribe: () => void;
   formatNumber: (num: number) => string;
 }
 
-const PackageCardDisplay = ({ pkg, onSubscribe, formatNumber }: PackageCardDisplayProps) => {
+const PackageCardDisplay = ({ pkg, currencyLabel, onSubscribe, formatNumber }: PackageCardDisplayProps) => {
   const monthlyProfit = pkg.daily_profit * 30;
   const totalProfit = pkg.daily_profit * (pkg.investment_period_days || 120);
 
@@ -179,14 +201,12 @@ const PackageCardDisplay = ({ pkg, onSubscribe, formatNumber }: PackageCardDispl
         </span>
       </div>
 
-      {pkg.name && (
-        <h3 className="text-lg font-bold mb-2">{pkg.name}</h3>
-      )}
+      {pkg.name && <h3 className="text-lg font-bold mb-2">{pkg.name}</h3>}
 
       <div className="mb-6">
         <p className="text-muted-foreground text-sm mb-2">مبلغ الاستثمار</p>
         <p className="text-3xl font-bold text-gradient-gold">
-          {formatNumber(pkg.investment_amount)} <span className="text-lg">ريال</span>
+          {formatNumber(pkg.investment_amount)} <span className="text-lg">{currencyLabel}</span>
         </p>
       </div>
 
@@ -196,18 +216,18 @@ const PackageCardDisplay = ({ pkg, onSubscribe, formatNumber }: PackageCardDispl
           <span className="text-muted-foreground text-sm">الربح اليومي</span>
         </div>
         <p className="text-2xl font-bold text-accent">
-          {formatNumber(pkg.daily_profit)} <span className="text-sm">ريال/يوم</span>
+          {formatNumber(pkg.daily_profit)} <span className="text-sm">{currencyLabel}/يوم</span>
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6 text-center">
         <div className="bg-secondary/30 rounded-lg p-3">
           <p className="text-muted-foreground text-xs mb-1">الربح الشهري</p>
-          <p className="text-foreground font-bold">{formatNumber(monthlyProfit)} ﷼</p>
+          <p className="text-foreground font-bold">{formatNumber(monthlyProfit)} {currencyLabel}</p>
         </div>
         <div className="bg-secondary/30 rounded-lg p-3">
           <p className="text-muted-foreground text-xs mb-1">إجمالي الربح</p>
-          <p className="text-primary font-bold">{formatNumber(totalProfit)} ﷼</p>
+          <p className="text-primary font-bold">{formatNumber(totalProfit)} {currencyLabel}</p>
         </div>
       </div>
 
