@@ -257,6 +257,28 @@ const AdminPaymentMethods = () => {
                 </>
               )}
 
+              {formData.method_type === "binance_usdt" && (
+                <>
+                  <div>
+                    <Label>اسم/الشبكة (مثال: Binance USDT TRC-20)</Label>
+                    <Input
+                      value={formData.bank_name}
+                      onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
+                      placeholder="Binance USDT (TRC-20)"
+                    />
+                  </div>
+                  <div>
+                    <Label>عنوان المحفظة (USDT Address)</Label>
+                    <Input
+                      value={formData.account_number}
+                      onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
+                      placeholder="TFQAqn3fYQjU5W7WWWomVFvv62asLwWsjR"
+                      className="font-mono text-xs"
+                    />
+                  </div>
+                </>
+              )}
+
               {formData.method_type === "whatsapp" && (
                 <div>
                   <Label>رقم الواتساب</Label>
