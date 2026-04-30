@@ -354,6 +354,7 @@ const AdminPaymentMethods = () => {
                         <p>{method.bank_name}</p>
                         <p className="font-mono text-xs break-all">العنوان: {method.account_number}</p>
                       </div>
+                    )}
                     {method.method_type === "whatsapp" && (
                       <p className="text-sm text-muted-foreground">
                         {method.whatsapp_number}
