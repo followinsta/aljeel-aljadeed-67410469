@@ -243,32 +243,42 @@ const AdminPackages = () => {
                 </div>
               </div>
 
+              <div>
+                <Label>العملة</Label>
+                <Select
+                  value={formData.currency}
+                  onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SAR">الريال السعودي (SAR)</SelectItem>
+                    <SelectItem value="USD">الدولار الأمريكي (USD)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>مبلغ الاستثمار (ريال)</Label>
+                  <Label>مبلغ الاستثمار ({formData.currency === "USD" ? "دولار" : "ريال"})</Label>
                   <Input
                     type="number"
                     value={formData.investment_amount}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        investment_amount: parseFloat(e.target.value),
-                      })
+                      setFormData({ ...formData, investment_amount: parseFloat(e.target.value) })
                     }
                     required
                   />
                 </div>
                 <div>
-                  <Label>الربح اليومي (ريال)</Label>
+                  <Label>الربح اليومي ({formData.currency === "USD" ? "دولار" : "ريال"})</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={formData.daily_profit}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        daily_profit: parseFloat(e.target.value),
-                      })
+                      setFormData({ ...formData, daily_profit: parseFloat(e.target.value) })
                     }
                     required
                   />
