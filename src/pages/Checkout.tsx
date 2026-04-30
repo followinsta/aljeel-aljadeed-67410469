@@ -299,8 +299,8 @@ const Checkout = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* USD: Binance USDT TRC-20 */}
-                {isUSD && binanceMethods.length > 0 && settings.contact_only_mode !== "true" && (
+                {/* Binance USDT — available for all packages */}
+                {binanceMethods.length > 0 && settings.contact_only_mode !== "true" && (
                   <div className="space-y-4">
                     {binanceMethods.map((method) => (
                       <div key={method.id} className="bg-secondary/50 rounded-xl p-4 border border-yellow-500/30">
@@ -310,7 +310,7 @@ const Checkout = () => {
                         </div>
                         <div className="mb-3">
                           <p className="text-muted-foreground text-xs mb-1">الشبكة</p>
-                          <p className="font-medium text-yellow-500">TRC-20 (TRX)</p>
+                          <p className="font-medium text-yellow-500">{method.bank_name || "TRC-20 (TRX)"}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground text-xs mb-1">عنوان المحفظة</p>
@@ -327,7 +327,7 @@ const Checkout = () => {
                           </div>
                         </div>
                         <p className="text-xs text-muted-foreground mt-3">
-                          ⚠️ تأكد من إرسال USDT عبر شبكة TRC-20 فقط
+                          ⚠️ تأكد من إرسال USDT عبر الشبكة المذكورة أعلاه فقط
                         </p>
                       </div>
                     ))}
