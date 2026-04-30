@@ -385,10 +385,13 @@ const AdminPackages = () => {
                     {pkg.name || `باقة ${pkg.package_number}`}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    الاستثمار: {pkg.investment_amount.toLocaleString()} ريال |
-                    الربح اليومي: {pkg.daily_profit} ريال
+                    الاستثمار: {pkg.investment_amount.toLocaleString()} {pkg.currency === "USD" ? "دولار" : "ريال"} |
+                    الربح اليومي: {pkg.daily_profit} {pkg.currency === "USD" ? "دولار" : "ريال"}
                   </p>
                   <div className="flex gap-2 mt-1">
+                    <span className={`text-xs px-2 py-0.5 rounded ${pkg.currency === "USD" ? "bg-green-500/20 text-green-500" : "bg-blue-500/20 text-blue-500"}`}>
+                      {pkg.currency === "USD" ? "USD 💵" : "SAR 🇸🇦"}
+                    </span>
                     {pkg.is_business && (
                       <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
                         أعمال
