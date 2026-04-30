@@ -156,6 +156,8 @@ const AdminPaymentMethods = () => {
     switch (type) {
       case "bank_transfer":
         return "تحويل بنكي";
+      case "binance_usdt":
+        return "باينانس USDT (TRC-20)";
       case "whatsapp":
         return "واتساب";
       case "telegram":
@@ -200,6 +202,7 @@ const AdminPaymentMethods = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="bank_transfer">تحويل بنكي</SelectItem>
+                    <SelectItem value="binance_usdt">باينانس USDT (TRC-20)</SelectItem>
                     <SelectItem value="whatsapp">واتساب</SelectItem>
                     <SelectItem value="telegram">تلقرام</SelectItem>
                   </SelectContent>
