@@ -186,6 +186,7 @@ export type Database = {
       packages: {
         Row: {
           created_at: string
+          currency: string
           daily_profit: number
           description: string | null
           id: string
@@ -201,6 +202,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          currency?: string
           daily_profit: number
           description?: string | null
           id?: string
@@ -216,6 +218,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          currency?: string
           daily_profit?: number
           description?: string | null
           id?: string
@@ -270,6 +273,63 @@ export type Database = {
           telegram_link?: string | null
           updated_at?: string
           whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
+      payment_receipts: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          currency: string | null
+          customer_id: string | null
+          email: string | null
+          full_name: string
+          id: string
+          package_amount: number | null
+          package_id: string | null
+          package_name: string | null
+          payment_method: string | null
+          phone: string | null
+          receipt_image_url: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          currency?: string | null
+          customer_id?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          package_amount?: number | null
+          package_id?: string | null
+          package_name?: string | null
+          payment_method?: string | null
+          phone?: string | null
+          receipt_image_url: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          currency?: string | null
+          customer_id?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          package_amount?: number | null
+          package_id?: string | null
+          package_name?: string | null
+          payment_method?: string | null
+          phone?: string | null
+          receipt_image_url?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
