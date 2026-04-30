@@ -260,11 +260,11 @@ const AdminPaymentMethods = () => {
               {formData.method_type === "binance_usdt" && (
                 <>
                   <div>
-                    <Label>اسم/الشبكة (مثال: Binance USDT TRC-20)</Label>
+                    <Label>الشبكة</Label>
                     <Input
                       value={formData.bank_name}
                       onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
-                      placeholder="Binance USDT (TRC-20)"
+                      placeholder="مثال: TRC-20 (TRX)"
                     />
                   </div>
                   <div>
