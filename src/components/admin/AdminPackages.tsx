@@ -15,6 +15,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Package {
   id: string;
@@ -28,6 +35,7 @@ interface Package {
   image_url: string | null;
   description: string | null;
   name: string | null;
+  currency: string;
 }
 
 const AdminPackages = () => {
@@ -46,6 +54,7 @@ const AdminPackages = () => {
     image_url: "",
     description: "",
     name: "",
+    currency: "SAR",
   });
   const [uploading, setUploading] = useState(false);
 
@@ -106,6 +115,7 @@ const AdminPackages = () => {
       image_url: formData.image_url || null,
       description: formData.description || null,
       name: formData.name || null,
+      currency: formData.currency,
     };
 
     if (editingPackage) {
@@ -149,6 +159,7 @@ const AdminPackages = () => {
       image_url: pkg.image_url || "",
       description: pkg.description || "",
       name: pkg.name || "",
+      currency: pkg.currency || "SAR",
     });
     setIsDialogOpen(true);
   };
@@ -179,6 +190,7 @@ const AdminPackages = () => {
       image_url: "",
       description: "",
       name: "",
+      currency: "SAR",
     });
   };
 
