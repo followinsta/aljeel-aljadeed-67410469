@@ -39,12 +39,22 @@ interface Package {
 interface PaymentMethod {
   id: string;
   method_type: string;
+  display_name: string | null;
+  note: string | null;
   bank_name: string | null;
   account_number: string | null;
   account_holder_name: string | null;
   iban: string | null;
   whatsapp_number: string | null;
   telegram_link: string | null;
+  custom_field_1_label: string | null;
+  custom_field_1_value: string | null;
+  custom_field_2_label: string | null;
+  custom_field_2_value: string | null;
+  custom_field_3_label: string | null;
+  custom_field_3_value: string | null;
+  custom_field_4_label: string | null;
+  custom_field_4_value: string | null;
 }
 
 interface SiteSetting {
