@@ -240,6 +240,7 @@ const Checkout = () => {
 
   const bankMethods = paymentMethods.filter(m => m.method_type === "bank_transfer" || m.method_type === "bank");
   const binanceMethods = paymentMethods.filter(m => m.method_type === "binance_usdt");
+  const customMethods = paymentMethods.filter(m => m.method_type === "custom");
   const isUSD = pkg.currency === "USD";
 
   return (
