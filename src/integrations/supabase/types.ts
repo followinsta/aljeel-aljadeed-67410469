@@ -240,10 +240,20 @@ export type Database = {
           account_number: string | null
           bank_name: string | null
           created_at: string
+          custom_field_1_label: string | null
+          custom_field_1_value: string | null
+          custom_field_2_label: string | null
+          custom_field_2_value: string | null
+          custom_field_3_label: string | null
+          custom_field_3_value: string | null
+          custom_field_4_label: string | null
+          custom_field_4_value: string | null
+          display_name: string | null
           iban: string | null
           id: string
           is_active: boolean | null
           method_type: string
+          note: string | null
           telegram_link: string | null
           updated_at: string
           whatsapp_number: string | null
@@ -253,10 +263,20 @@ export type Database = {
           account_number?: string | null
           bank_name?: string | null
           created_at?: string
+          custom_field_1_label?: string | null
+          custom_field_1_value?: string | null
+          custom_field_2_label?: string | null
+          custom_field_2_value?: string | null
+          custom_field_3_label?: string | null
+          custom_field_3_value?: string | null
+          custom_field_4_label?: string | null
+          custom_field_4_value?: string | null
+          display_name?: string | null
           iban?: string | null
           id?: string
           is_active?: boolean | null
           method_type: string
+          note?: string | null
           telegram_link?: string | null
           updated_at?: string
           whatsapp_number?: string | null
@@ -266,10 +286,20 @@ export type Database = {
           account_number?: string | null
           bank_name?: string | null
           created_at?: string
+          custom_field_1_label?: string | null
+          custom_field_1_value?: string | null
+          custom_field_2_label?: string | null
+          custom_field_2_value?: string | null
+          custom_field_3_label?: string | null
+          custom_field_3_value?: string | null
+          custom_field_4_label?: string | null
+          custom_field_4_value?: string | null
+          display_name?: string | null
           iban?: string | null
           id?: string
           is_active?: boolean | null
           method_type?: string
+          note?: string | null
           telegram_link?: string | null
           updated_at?: string
           whatsapp_number?: string | null

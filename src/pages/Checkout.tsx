@@ -39,12 +39,22 @@ interface Package {
 interface PaymentMethod {
   id: string;
   method_type: string;
+  display_name: string | null;
+  note: string | null;
   bank_name: string | null;
   account_number: string | null;
   account_holder_name: string | null;
   iban: string | null;
   whatsapp_number: string | null;
   telegram_link: string | null;
+  custom_field_1_label: string | null;
+  custom_field_1_value: string | null;
+  custom_field_2_label: string | null;
+  custom_field_2_value: string | null;
+  custom_field_3_label: string | null;
+  custom_field_3_value: string | null;
+  custom_field_4_label: string | null;
+  custom_field_4_value: string | null;
 }
 
 interface SiteSetting {
@@ -69,7 +79,10 @@ const Checkout = () => {
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [submittingReceipt, setSubmittingReceipt] = useState(false);
   const [receiptUploaded, setReceiptUploaded] = useState(false);
+  const [pendingReceiptUrl, setPendingReceiptUrl] = useState<string | null>(null);
+  const [pendingReceiptPath, setPendingReceiptPath] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -152,6 +165,20 @@ const Checkout = () => {
 
       const { data: urlData } = supabase.storage.from("payment-receipts").getPublicUrl(fileName);
 
+      setPendingReceiptUrl(urlData.publicUrl);
+      setPendingReceiptPath(fileName);
+      toast.success("تم رفع الصورة. اضغط 'إرسال الإيصال' لإكمال العملية");
+    } catch (err: any) {
+      toast.error(err.message || "خطأ في رفع الصورة");
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
+
+  const handleSubmitReceipt = async () => {
+    if (!pendingReceiptUrl || !pkg || !user) return;
+    setSubmittingReceipt(true);
+    try {
       const { error: insertError } = await supabase.from("payment_receipts").insert({
         user_id: user.id,
         customer_id: userProfile?.customer_id || null,
@@ -163,19 +190,30 @@ const Checkout = () => {
         package_amount: pkg.investment_amount,
         currency: pkg.currency || "SAR",
         payment_method: pkg.currency === "USD" ? "binance_usdt" : "bank_transfer",
-        receipt_image_url: urlData.publicUrl,
+        receipt_image_url: pendingReceiptUrl,
         status: "pending",
       });
 
       if (insertError) throw insertError;
 
       setReceiptUploaded(true);
-      toast.success("تم رفع الإيصال بنجاح! سيتم مراجعته من قبل الإدارة");
+      setPendingReceiptUrl(null);
+      setPendingReceiptPath(null);
+      toast.success("تم إرسال الإيصال بنجاح! سيتم مراجعته من قبل الإدارة");
     } catch (err: any) {
-      toast.error(err.message || "خطأ في رفع الإيصال");
+      toast.error(err.message || "خطأ في إرسال الإيصال");
     } finally {
-      setUploadingReceipt(false);
+      setSubmittingReceipt(false);
     }
+  };
+
+  const handleCancelPendingReceipt = async () => {
+    if (pendingReceiptPath) {
+      await supabase.storage.from("payment-receipts").remove([pendingReceiptPath]);
+    }
+    setPendingReceiptUrl(null);
+    setPendingReceiptPath(null);
+    toast.info("تم إلغاء الصورة");
   };
 
   if (loading) {
@@ -202,6 +240,7 @@ const Checkout = () => {
 
   const bankMethods = paymentMethods.filter(m => m.method_type === "bank_transfer" || m.method_type === "bank");
   const binanceMethods = paymentMethods.filter(m => m.method_type === "binance_usdt");
+  const customMethods = paymentMethods.filter(m => m.method_type === "custom");
   const isUSD = pkg.currency === "USD";
 
   return (
@@ -306,11 +345,14 @@ const Checkout = () => {
                       <div key={method.id} className="bg-secondary/50 rounded-xl p-4 border border-yellow-500/30">
                         <div className="flex items-center gap-2 mb-3">
                           <Bitcoin className="w-5 h-5 text-yellow-500" />
-                          <span className="font-bold">التحويل عبر باينانس USDT</span>
+                          <span className="font-bold">{method.display_name || "التحويل عبر باينانس USDT"}</span>
                         </div>
                         <div className="mb-3">
                           <p className="text-muted-foreground text-xs mb-1">الشبكة</p>
                           <p className="font-medium text-yellow-500">{method.bank_name || "TRC-20 (TRX)"}</p>
+                          {method.note && (
+                            <p className="text-xs text-muted-foreground mt-1 italic">{method.note}</p>
+                          )}
                         </div>
                         <div>
                           <p className="text-muted-foreground text-xs mb-1">عنوان المحفظة</p>
@@ -326,9 +368,48 @@ const Checkout = () => {
                             </Button>
                           </div>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-3">
-                          ⚠️ تأكد من إرسال USDT عبر الشبكة المذكورة أعلاه فقط
-                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Custom Payment Methods */}
+                {customMethods.length > 0 && settings.contact_only_mode !== "true" && (
+                  <div className="space-y-4">
+                    {customMethods.map((method) => (
+                      <div key={method.id} className="bg-secondary/50 rounded-xl p-4 border border-primary/30">
+                        <div className="flex items-center gap-2 mb-3">
+                          <CreditCard className="w-5 h-5 text-primary" />
+                          <span className="font-bold">{method.display_name || "طريقة دفع"}</span>
+                        </div>
+                        {method.note && (
+                          <p className="text-xs text-muted-foreground mb-3 italic">{method.note}</p>
+                        )}
+                        <div className="space-y-2">
+                          {[1, 2, 3, 4].map((n) => {
+                            const label = (method as any)[`custom_field_${n}_label`];
+                            const value = (method as any)[`custom_field_${n}_value`];
+                            if (!label && !value) return null;
+                            return (
+                              <div key={n}>
+                                <p className="text-muted-foreground text-xs mb-1">{label}</p>
+                                <div className="flex items-center gap-2 bg-background/50 rounded p-2">
+                                  <p className="font-mono text-xs break-all flex-1">{value}</p>
+                                  {value && (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      type="button"
+                                      onClick={() => handleCopy(value, label || "القيمة")}
+                                    >
+                                      <Copy className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -374,25 +455,61 @@ const Checkout = () => {
                   {receiptUploaded ? (
                     <div className="flex items-center justify-center gap-2 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-500">
                       <CheckCircle2 className="w-5 h-5" />
-                      <span className="font-medium">تم رفع الإيصال بنجاح</span>
+                      <span className="font-medium">تم إرسال الإيصال بنجاح</span>
                     </div>
                   ) : user ? (
-                    <div>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleReceiptUpload}
-                        disabled={uploadingReceipt}
-                        className="cursor-pointer"
-                      />
-                      {uploadingReceipt && (
-                        <p className="text-sm text-muted-foreground mt-2 text-center">
-                          جاري الرفع...
-                        </p>
+                    <div className="space-y-3">
+                      {!pendingReceiptUrl ? (
+                        <>
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleReceiptUpload}
+                            disabled={uploadingReceipt}
+                            className="cursor-pointer"
+                          />
+                          {uploadingReceipt && (
+                            <p className="text-sm text-muted-foreground mt-2 text-center">
+                              جاري رفع الصورة...
+                            </p>
+                          )}
+                          <p className="text-xs text-muted-foreground mt-2 text-center">
+                            ارفع صورة الإيصال أولاً ثم اضغط زر "إرسال الإيصال"
+                          </p>
+                        </>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="border border-border rounded-lg p-2 bg-background/50">
+                            <img
+                              src={pendingReceiptUrl}
+                              alt="معاينة الإيصال"
+                              className="max-h-48 mx-auto rounded"
+                            />
+                            <p className="text-xs text-center text-muted-foreground mt-2">
+                              ✓ تم رفع الصورة - راجعها قبل الإرسال
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              className="flex-1 bg-primary"
+                              onClick={handleSubmitReceipt}
+                              disabled={submittingReceipt}
+                            >
+                              <Send className="w-4 h-4 ml-2" />
+                              {submittingReceipt ? "جاري الإرسال..." : "إرسال الإيصال للإدارة"}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={handleCancelPendingReceipt}
+                              disabled={submittingReceipt}
+                            >
+                              إلغاء
+                            </Button>
+                          </div>
+                        </div>
                       )}
-                      <p className="text-xs text-muted-foreground mt-2 text-center">
-                        ارفع صورة إيصال التحويل وستصل إلى لوحة تحكم الإدارة
-                      </p>
                     </div>
                   ) : (
                     <div className="text-center p-3 bg-secondary/30 rounded-lg">
