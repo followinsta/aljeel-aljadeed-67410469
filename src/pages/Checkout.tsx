@@ -165,6 +165,20 @@ const Checkout = () => {
 
       const { data: urlData } = supabase.storage.from("payment-receipts").getPublicUrl(fileName);
 
+      setPendingReceiptUrl(urlData.publicUrl);
+      setPendingReceiptPath(fileName);
+      toast.success("تم رفع الصورة. اضغط 'إرسال الإيصال' لإكمال العملية");
+    } catch (err: any) {
+      toast.error(err.message || "خطأ في رفع الصورة");
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
+
+  const handleSubmitReceipt = async () => {
+    if (!pendingReceiptUrl || !pkg || !user) return;
+    setSubmittingReceipt(true);
+    try {
       const { error: insertError } = await supabase.from("payment_receipts").insert({
         user_id: user.id,
         customer_id: userProfile?.customer_id || null,
@@ -176,19 +190,30 @@ const Checkout = () => {
         package_amount: pkg.investment_amount,
         currency: pkg.currency || "SAR",
         payment_method: pkg.currency === "USD" ? "binance_usdt" : "bank_transfer",
-        receipt_image_url: urlData.publicUrl,
+        receipt_image_url: pendingReceiptUrl,
         status: "pending",
       });
 
       if (insertError) throw insertError;
 
       setReceiptUploaded(true);
-      toast.success("تم رفع الإيصال بنجاح! سيتم مراجعته من قبل الإدارة");
+      setPendingReceiptUrl(null);
+      setPendingReceiptPath(null);
+      toast.success("تم إرسال الإيصال بنجاح! سيتم مراجعته من قبل الإدارة");
     } catch (err: any) {
-      toast.error(err.message || "خطأ في رفع الإيصال");
+      toast.error(err.message || "خطأ في إرسال الإيصال");
     } finally {
-      setUploadingReceipt(false);
+      setSubmittingReceipt(false);
     }
+  };
+
+  const handleCancelPendingReceipt = async () => {
+    if (pendingReceiptPath) {
+      await supabase.storage.from("payment-receipts").remove([pendingReceiptPath]);
+    }
+    setPendingReceiptUrl(null);
+    setPendingReceiptPath(null);
+    toast.info("تم إلغاء الصورة");
   };
 
   if (loading) {
