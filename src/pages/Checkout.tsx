@@ -345,11 +345,14 @@ const Checkout = () => {
                       <div key={method.id} className="bg-secondary/50 rounded-xl p-4 border border-yellow-500/30">
                         <div className="flex items-center gap-2 mb-3">
                           <Bitcoin className="w-5 h-5 text-yellow-500" />
-                          <span className="font-bold">التحويل عبر باينانس USDT</span>
+                          <span className="font-bold">{method.display_name || "التحويل عبر باينانس USDT"}</span>
                         </div>
                         <div className="mb-3">
                           <p className="text-muted-foreground text-xs mb-1">الشبكة</p>
                           <p className="font-medium text-yellow-500">{method.bank_name || "TRC-20 (TRX)"}</p>
+                          {method.note && (
+                            <p className="text-xs text-muted-foreground mt-1 italic">{method.note}</p>
+                          )}
                         </div>
                         <div>
                           <p className="text-muted-foreground text-xs mb-1">عنوان المحفظة</p>
@@ -365,9 +368,48 @@ const Checkout = () => {
                             </Button>
                           </div>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-3">
-                          ⚠️ تأكد من إرسال USDT عبر الشبكة المذكورة أعلاه فقط
-                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Custom Payment Methods */}
+                {customMethods.length > 0 && settings.contact_only_mode !== "true" && (
+                  <div className="space-y-4">
+                    {customMethods.map((method) => (
+                      <div key={method.id} className="bg-secondary/50 rounded-xl p-4 border border-primary/30">
+                        <div className="flex items-center gap-2 mb-3">
+                          <CreditCard className="w-5 h-5 text-primary" />
+                          <span className="font-bold">{method.display_name || "طريقة دفع"}</span>
+                        </div>
+                        {method.note && (
+                          <p className="text-xs text-muted-foreground mb-3 italic">{method.note}</p>
+                        )}
+                        <div className="space-y-2">
+                          {[1, 2, 3, 4].map((n) => {
+                            const label = (method as any)[`custom_field_${n}_label`];
+                            const value = (method as any)[`custom_field_${n}_value`];
+                            if (!label && !value) return null;
+                            return (
+                              <div key={n}>
+                                <p className="text-muted-foreground text-xs mb-1">{label}</p>
+                                <div className="flex items-center gap-2 bg-background/50 rounded p-2">
+                                  <p className="font-mono text-xs break-all flex-1">{value}</p>
+                                  {value && (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      type="button"
+                                      onClick={() => handleCopy(value, label || "القيمة")}
+                                    >
+                                      <Copy className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     ))}
                   </div>
