@@ -79,7 +79,10 @@ const Checkout = () => {
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [submittingReceipt, setSubmittingReceipt] = useState(false);
   const [receiptUploaded, setReceiptUploaded] = useState(false);
+  const [pendingReceiptUrl, setPendingReceiptUrl] = useState<string | null>(null);
+  const [pendingReceiptPath, setPendingReceiptPath] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
