@@ -138,6 +138,9 @@ export type Database = {
           subscription_start_date: string
           total_accumulated_profit: number
           updated_at: string
+          withdraw_action_button_enabled: boolean
+          withdraw_action_button_text: string | null
+          withdraw_action_button_url: string | null
           withdraw_button_enabled: boolean
           withdraw_button_text: string | null
         }
@@ -161,6 +164,9 @@ export type Database = {
           subscription_start_date?: string
           total_accumulated_profit?: number
           updated_at?: string
+          withdraw_action_button_enabled?: boolean
+          withdraw_action_button_text?: string | null
+          withdraw_action_button_url?: string | null
           withdraw_button_enabled?: boolean
           withdraw_button_text?: string | null
         }
@@ -184,6 +190,9 @@ export type Database = {
           subscription_start_date?: string
           total_accumulated_profit?: number
           updated_at?: string
+          withdraw_action_button_enabled?: boolean
+          withdraw_action_button_text?: string | null
+          withdraw_action_button_url?: string | null
           withdraw_button_enabled?: boolean
           withdraw_button_text?: string | null
         }
