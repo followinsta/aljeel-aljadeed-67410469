@@ -112,7 +112,10 @@ const AdminInvestors = () => {
     is_previous_subscriber: false,
     previous_accumulated_profit: "0",
     withdraw_button_enabled: false,
-    withdraw_button_text: ""
+    withdraw_button_text: "",
+    withdraw_action_button_enabled: false,
+    withdraw_action_button_text: "",
+    withdraw_action_button_url: ""
   });
 
   useEffect(() => {
