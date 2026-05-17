@@ -199,7 +199,9 @@ const AdminInvestors = () => {
       email: formData.email || null,
       notes: formData.notes || null,
       total_accumulated_profit: previousProfit,
-      linked_customer_id: linkedCustomerId || null
+      linked_customer_id: linkedCustomerId || null,
+      withdraw_button_enabled: formData.withdraw_button_enabled,
+      withdraw_button_text: formData.withdraw_button_text || null
     };
 
     if (editingInvestor) {
