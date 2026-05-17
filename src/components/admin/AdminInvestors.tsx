@@ -358,7 +358,9 @@ const AdminInvestors = () => {
       email: "",
       notes: "",
       is_previous_subscriber: false,
-      previous_accumulated_profit: "0"
+      previous_accumulated_profit: "0",
+      withdraw_button_enabled: false,
+      withdraw_button_text: ""
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
