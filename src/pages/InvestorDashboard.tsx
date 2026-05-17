@@ -57,6 +57,7 @@ const InvestorDashboard = () => {
   const [fees, setFees] = useState<InvestorFee[]>([]);
   const [profitHistory, setProfitHistory] = useState<ProfitHistory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
 
   useEffect(() => {
     fetchInvestorData();
