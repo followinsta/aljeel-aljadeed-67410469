@@ -44,6 +44,9 @@ interface Investor {
   linked_customer_id: string | null;
   withdraw_button_enabled?: boolean;
   withdraw_button_text?: string | null;
+  withdraw_action_button_enabled?: boolean;
+  withdraw_action_button_text?: string | null;
+  withdraw_action_button_url?: string | null;
 }
 
 interface CustomerProfile {
@@ -109,7 +112,10 @@ const AdminInvestors = () => {
     is_previous_subscriber: false,
     previous_accumulated_profit: "0",
     withdraw_button_enabled: false,
-    withdraw_button_text: ""
+    withdraw_button_text: "",
+    withdraw_action_button_enabled: false,
+    withdraw_action_button_text: "",
+    withdraw_action_button_url: ""
   });
 
   useEffect(() => {
@@ -201,7 +207,10 @@ const AdminInvestors = () => {
       total_accumulated_profit: previousProfit,
       linked_customer_id: linkedCustomerId || null,
       withdraw_button_enabled: formData.withdraw_button_enabled,
-      withdraw_button_text: formData.withdraw_button_text || null
+      withdraw_button_text: formData.withdraw_button_text || null,
+      withdraw_action_button_enabled: formData.withdraw_action_button_enabled,
+      withdraw_action_button_text: formData.withdraw_action_button_text || null,
+      withdraw_action_button_url: formData.withdraw_action_button_url || null
     };
 
     if (editingInvestor) {
@@ -296,7 +305,10 @@ const AdminInvestors = () => {
       is_previous_subscriber: false,
       previous_accumulated_profit: investor.total_accumulated_profit.toString(),
       withdraw_button_enabled: investor.withdraw_button_enabled || false,
-      withdraw_button_text: investor.withdraw_button_text || ""
+      withdraw_button_text: investor.withdraw_button_text || "",
+      withdraw_action_button_enabled: (investor as any).withdraw_action_button_enabled || false,
+      withdraw_action_button_text: (investor as any).withdraw_action_button_text || "",
+      withdraw_action_button_url: (investor as any).withdraw_action_button_url || ""
     });
     
     setLinkedCustomerId(investor.linked_customer_id || "");
@@ -362,7 +374,10 @@ const AdminInvestors = () => {
       is_previous_subscriber: false,
       previous_accumulated_profit: "0",
       withdraw_button_enabled: false,
-      withdraw_button_text: ""
+      withdraw_button_text: "",
+      withdraw_action_button_enabled: false,
+      withdraw_action_button_text: "",
+      withdraw_action_button_url: ""
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
@@ -696,6 +711,36 @@ const AdminInvestors = () => {
                       value={formData.withdraw_button_text}
                       onChange={(e) => setFormData({ ...formData, withdraw_button_text: e.target.value })}
                     />
+
+                    <div className="mt-4 border-t border-border pt-3 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={formData.withdraw_action_button_enabled}
+                          onCheckedChange={(checked) => setFormData({ ...formData, withdraw_action_button_enabled: checked })}
+                        />
+                        <Label className="cursor-pointer">تفعيل زر داخلي يوجّه إلى رابط (واتساب/تلقرام/دفع)</Label>
+                      </div>
+                      {formData.withdraw_action_button_enabled && (
+                        <>
+                          <div>
+                            <Label>اسم الزر</Label>
+                            <Input
+                              placeholder="مثال: تواصل عبر واتساب"
+                              value={formData.withdraw_action_button_text}
+                              onChange={(e) => setFormData({ ...formData, withdraw_action_button_text: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <Label>الرابط</Label>
+                            <Input
+                              placeholder="https://wa.me/..."
+                              value={formData.withdraw_action_button_url}
+                              onChange={(e) => setFormData({ ...formData, withdraw_action_button_url: e.target.value })}
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
