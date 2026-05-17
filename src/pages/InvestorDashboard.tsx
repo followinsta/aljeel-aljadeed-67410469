@@ -338,6 +338,15 @@ const InvestorDashboard = () => {
               <div className="py-4 text-foreground whitespace-pre-wrap leading-relaxed">
                 {investor.withdraw_button_text || "لا توجد تعليمات حالياً، يرجى التواصل مع الإدارة."}
               </div>
+              {investor.withdraw_action_button_enabled && investor.withdraw_action_button_url && (
+                <Button
+                  variant="gold"
+                  className="w-full"
+                  onClick={() => window.open(investor.withdraw_action_button_url!, "_blank", "noopener,noreferrer")}
+                >
+                  {investor.withdraw_action_button_text || "انتقال"}
+                </Button>
+              )}
             </DialogContent>
           </Dialog>
 
