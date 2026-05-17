@@ -31,6 +31,8 @@ interface Investor {
   total_accumulated_profit: number;
   is_active: boolean;
   email: string | null;
+  withdraw_button_enabled?: boolean;
+  withdraw_button_text?: string | null;
 }
 
 interface InvestorFee {
