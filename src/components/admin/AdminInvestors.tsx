@@ -42,6 +42,8 @@ interface Investor {
   email: string | null;
   notes: string | null;
   linked_customer_id: string | null;
+  withdraw_button_enabled?: boolean;
+  withdraw_button_text?: string | null;
 }
 
 interface CustomerProfile {
