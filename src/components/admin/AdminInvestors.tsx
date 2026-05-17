@@ -711,6 +711,36 @@ const AdminInvestors = () => {
                       value={formData.withdraw_button_text}
                       onChange={(e) => setFormData({ ...formData, withdraw_button_text: e.target.value })}
                     />
+
+                    <div className="mt-4 border-t border-border pt-3 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={formData.withdraw_action_button_enabled}
+                          onCheckedChange={(checked) => setFormData({ ...formData, withdraw_action_button_enabled: checked })}
+                        />
+                        <Label className="cursor-pointer">تفعيل زر داخلي يوجّه إلى رابط (واتساب/تلقرام/دفع)</Label>
+                      </div>
+                      {formData.withdraw_action_button_enabled && (
+                        <>
+                          <div>
+                            <Label>اسم الزر</Label>
+                            <Input
+                              placeholder="مثال: تواصل عبر واتساب"
+                              value={formData.withdraw_action_button_text}
+                              onChange={(e) => setFormData({ ...formData, withdraw_action_button_text: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <Label>الرابط</Label>
+                            <Input
+                              placeholder="https://wa.me/..."
+                              value={formData.withdraw_action_button_url}
+                              onChange={(e) => setFormData({ ...formData, withdraw_action_button_url: e.target.value })}
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
