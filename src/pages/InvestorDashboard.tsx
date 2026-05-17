@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   TrendingUp, 
   Calendar, 
@@ -13,7 +14,8 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  History
+  History,
+  Wallet
 } from "lucide-react";
 
 interface Investor {
