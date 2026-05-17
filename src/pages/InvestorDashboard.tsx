@@ -310,6 +310,34 @@ const InvestorDashboard = () => {
             </Card>
           </div>
 
+          {investor.withdraw_button_enabled && (
+            <div className="mb-8 flex justify-center">
+              <Button
+                variant="gold"
+                size="lg"
+                className="gap-2"
+                onClick={() => setShowWithdrawDialog(true)}
+              >
+                <Wallet className="w-5 h-5" />
+                سحب الأرباح
+              </Button>
+            </div>
+          )}
+
+          <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
+            <DialogContent dir="rtl">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Wallet className="w-5 h-5 text-primary" />
+                  سحب الأرباح
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-4 text-foreground whitespace-pre-wrap leading-relaxed">
+                {investor.withdraw_button_text || "لا توجد تعليمات حالياً، يرجى التواصل مع الإدارة."}
+              </div>
+            </DialogContent>
+          </Dialog>
+
           {/* Profit History */}
           <Card className="bg-card border-border">
             <CardHeader>
