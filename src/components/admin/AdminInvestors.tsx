@@ -42,6 +42,8 @@ interface Investor {
   email: string | null;
   notes: string | null;
   linked_customer_id: string | null;
+  withdraw_button_enabled?: boolean;
+  withdraw_button_text?: string | null;
 }
 
 interface CustomerProfile {
@@ -105,7 +107,9 @@ const AdminInvestors = () => {
     email: "",
     notes: "",
     is_previous_subscriber: false,
-    previous_accumulated_profit: "0"
+    previous_accumulated_profit: "0",
+    withdraw_button_enabled: false,
+    withdraw_button_text: ""
   });
 
   useEffect(() => {
@@ -195,7 +199,9 @@ const AdminInvestors = () => {
       email: formData.email || null,
       notes: formData.notes || null,
       total_accumulated_profit: previousProfit,
-      linked_customer_id: linkedCustomerId || null
+      linked_customer_id: linkedCustomerId || null,
+      withdraw_button_enabled: formData.withdraw_button_enabled,
+      withdraw_button_text: formData.withdraw_button_text || null
     };
 
     if (editingInvestor) {
@@ -288,7 +294,9 @@ const AdminInvestors = () => {
       email: investor.email || "",
       notes: investor.notes || "",
       is_previous_subscriber: false,
-      previous_accumulated_profit: investor.total_accumulated_profit.toString()
+      previous_accumulated_profit: investor.total_accumulated_profit.toString(),
+      withdraw_button_enabled: investor.withdraw_button_enabled || false,
+      withdraw_button_text: investor.withdraw_button_text || ""
     });
     
     setLinkedCustomerId(investor.linked_customer_id || "");
@@ -352,7 +360,9 @@ const AdminInvestors = () => {
       email: "",
       notes: "",
       is_previous_subscriber: false,
-      previous_accumulated_profit: "0"
+      previous_accumulated_profit: "0",
+      withdraw_button_enabled: false,
+      withdraw_button_text: ""
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
@@ -668,6 +678,26 @@ const AdminInvestors = () => {
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 />
+              </div>
+
+              <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/20">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.withdraw_button_enabled}
+                    onCheckedChange={(checked) => setFormData({ ...formData, withdraw_button_enabled: checked })}
+                  />
+                  <Label className="cursor-pointer">تفعيل زر "سحب الأرباح" للمستثمر</Label>
+                </div>
+                {formData.withdraw_button_enabled && (
+                  <div>
+                    <Label>النص الذي يظهر عند الضغط على الزر</Label>
+                    <Input
+                      placeholder="اكتب الرسالة التي تظهر للمستثمر عند الضغط على زر سحب الأرباح"
+                      value={formData.withdraw_button_text}
+                      onChange={(e) => setFormData({ ...formData, withdraw_button_text: e.target.value })}
+                    />
+                  </div>
+                )}
               </div>
 
               <Button type="submit" variant="gold" className="w-full">

@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   TrendingUp, 
   Calendar, 
@@ -13,7 +14,8 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  History
+  History,
+  Wallet
 } from "lucide-react";
 
 interface Investor {
@@ -31,6 +33,8 @@ interface Investor {
   total_accumulated_profit: number;
   is_active: boolean;
   email: string | null;
+  withdraw_button_enabled?: boolean;
+  withdraw_button_text?: string | null;
 }
 
 interface InvestorFee {
@@ -53,6 +57,7 @@ const InvestorDashboard = () => {
   const [fees, setFees] = useState<InvestorFee[]>([]);
   const [profitHistory, setProfitHistory] = useState<ProfitHistory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
 
   useEffect(() => {
     fetchInvestorData();
@@ -304,6 +309,34 @@ const InvestorDashboard = () => {
               </CardContent>
             </Card>
           </div>
+
+          {investor.withdraw_button_enabled && (
+            <div className="mb-8 flex justify-center">
+              <Button
+                variant="gold"
+                size="lg"
+                className="gap-2"
+                onClick={() => setShowWithdrawDialog(true)}
+              >
+                <Wallet className="w-5 h-5" />
+                سحب الأرباح
+              </Button>
+            </div>
+          )}
+
+          <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
+            <DialogContent dir="rtl">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Wallet className="w-5 h-5 text-primary" />
+                  سحب الأرباح
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-4 text-foreground whitespace-pre-wrap leading-relaxed">
+                {investor.withdraw_button_text || "لا توجد تعليمات حالياً، يرجى التواصل مع الإدارة."}
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Profit History */}
           <Card className="bg-card border-border">

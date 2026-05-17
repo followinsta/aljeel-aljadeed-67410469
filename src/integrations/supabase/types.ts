@@ -138,6 +138,8 @@ export type Database = {
           subscription_start_date: string
           total_accumulated_profit: number
           updated_at: string
+          withdraw_button_enabled: boolean
+          withdraw_button_text: string | null
         }
         Insert: {
           bank_account_number?: string | null
@@ -159,6 +161,8 @@ export type Database = {
           subscription_start_date?: string
           total_accumulated_profit?: number
           updated_at?: string
+          withdraw_button_enabled?: boolean
+          withdraw_button_text?: string | null
         }
         Update: {
           bank_account_number?: string | null
@@ -180,6 +184,8 @@ export type Database = {
           subscription_start_date?: string
           total_accumulated_profit?: number
           updated_at?: string
+          withdraw_button_enabled?: boolean
+          withdraw_button_text?: string | null
         }
         Relationships: []
       }
