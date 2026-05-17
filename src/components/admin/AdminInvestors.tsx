@@ -680,6 +680,26 @@ const AdminInvestors = () => {
                 />
               </div>
 
+              <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/20">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.withdraw_button_enabled}
+                    onCheckedChange={(checked) => setFormData({ ...formData, withdraw_button_enabled: checked })}
+                  />
+                  <Label className="cursor-pointer">تفعيل زر "سحب الأرباح" للمستثمر</Label>
+                </div>
+                {formData.withdraw_button_enabled && (
+                  <div>
+                    <Label>النص الذي يظهر عند الضغط على الزر</Label>
+                    <Input
+                      placeholder="اكتب الرسالة التي تظهر للمستثمر عند الضغط على زر سحب الأرباح"
+                      value={formData.withdraw_button_text}
+                      onChange={(e) => setFormData({ ...formData, withdraw_button_text: e.target.value })}
+                    />
+                  </div>
+                )}
+              </div>
+
               <Button type="submit" variant="gold" className="w-full">
                 {editingInvestor ? "تحديث" : "إضافة"}
               </Button>
