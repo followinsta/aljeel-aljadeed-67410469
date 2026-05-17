@@ -207,7 +207,10 @@ const AdminInvestors = () => {
       total_accumulated_profit: previousProfit,
       linked_customer_id: linkedCustomerId || null,
       withdraw_button_enabled: formData.withdraw_button_enabled,
-      withdraw_button_text: formData.withdraw_button_text || null
+      withdraw_button_text: formData.withdraw_button_text || null,
+      withdraw_action_button_enabled: formData.withdraw_action_button_enabled,
+      withdraw_action_button_text: formData.withdraw_action_button_text || null,
+      withdraw_action_button_url: formData.withdraw_action_button_url || null
     };
 
     if (editingInvestor) {
