@@ -292,7 +292,9 @@ const AdminInvestors = () => {
       email: investor.email || "",
       notes: investor.notes || "",
       is_previous_subscriber: false,
-      previous_accumulated_profit: investor.total_accumulated_profit.toString()
+      previous_accumulated_profit: investor.total_accumulated_profit.toString(),
+      withdraw_button_enabled: investor.withdraw_button_enabled || false,
+      withdraw_button_text: investor.withdraw_button_text || ""
     });
     
     setLinkedCustomerId(investor.linked_customer_id || "");
