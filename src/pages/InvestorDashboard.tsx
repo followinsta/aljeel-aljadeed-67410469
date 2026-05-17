@@ -35,6 +35,9 @@ interface Investor {
   email: string | null;
   withdraw_button_enabled?: boolean;
   withdraw_button_text?: string | null;
+  withdraw_action_button_enabled?: boolean;
+  withdraw_action_button_text?: string | null;
+  withdraw_action_button_url?: string | null;
 }
 
 interface InvestorFee {
