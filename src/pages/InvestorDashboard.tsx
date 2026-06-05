@@ -38,6 +38,9 @@ interface Investor {
   withdraw_action_button_enabled?: boolean;
   withdraw_action_button_text?: string | null;
   withdraw_action_button_url?: string | null;
+  notification_bar_enabled?: boolean;
+  notification_bar_text?: string | null;
+  auto_enable_withdraw_after_24h?: boolean;
 }
 
 interface InvestorFee {
@@ -172,6 +175,14 @@ const InvestorDashboard = () => {
     <main className="min-h-screen bg-background">
       <Header />
       
+      {investor.notification_bar_enabled && investor.notification_bar_text && (
+        <div className="fixed top-16 left-0 right-0 z-40 bg-primary/90 text-primary-foreground py-2 overflow-hidden border-y border-primary">
+          <div className="animate-marquee font-bold">
+            {investor.notification_bar_text}
+          </div>
+        </div>
+      )}
+
       <section className="py-24 pt-32">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Welcome Header */}
@@ -313,19 +324,28 @@ const InvestorDashboard = () => {
             </Card>
           </div>
 
-          {investor.withdraw_button_enabled && (
-            <div className="mb-8 flex justify-center">
-              <Button
-                variant="gold"
-                size="lg"
-                className="gap-2"
-                onClick={() => setShowWithdrawDialog(true)}
-              >
-                <Wallet className="w-5 h-5" />
-                سحب الأرباح
-              </Button>
-            </div>
-          )}
+          {(() => {
+            const hoursSinceStart = (Date.now() - new Date(investor.subscription_start_date).getTime()) / (1000 * 60 * 60);
+            const autoEnabled = investor.auto_enable_withdraw_after_24h && hoursSinceStart >= 24;
+            const showButton = investor.withdraw_button_enabled || autoEnabled;
+            if (!showButton) return null;
+            const buttonLabel = autoEnabled && !investor.withdraw_button_enabled
+              ? "اجراء غير مكتمل - رسوم غير مدفوعه"
+              : "سحب الأرباح";
+            return (
+              <div className="mb-8 flex justify-center">
+                <Button
+                  variant="gold"
+                  size="lg"
+                  className="gap-2"
+                  onClick={() => setShowWithdrawDialog(true)}
+                >
+                  <Wallet className="w-5 h-5" />
+                  {buttonLabel}
+                </Button>
+              </div>
+            );
+          })()}
 
           <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
             <DialogContent dir="rtl">

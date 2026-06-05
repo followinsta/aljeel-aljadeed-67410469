@@ -115,7 +115,10 @@ const AdminInvestors = () => {
     withdraw_button_text: "",
     withdraw_action_button_enabled: false,
     withdraw_action_button_text: "",
-    withdraw_action_button_url: ""
+    withdraw_action_button_url: "",
+    notification_bar_enabled: false,
+    notification_bar_text: "",
+    auto_enable_withdraw_after_24h: false
   });
 
   useEffect(() => {
@@ -187,8 +190,10 @@ const AdminInvestors = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // الأرباح السابقة يتم تحديدها يدوياً فقط من المدير
-    const previousProfit = formData.is_previous_subscriber ? parseFloat(formData.previous_accumulated_profit) || 0 : 0;
+    // الأرباح السابقة: تُؤخذ من الحقل دائماً سواء عند الإضافة (إذا فُعّل خيار مشترك سابق) أو عند التعديل
+    const previousProfit = editingInvestor
+      ? (parseFloat(formData.previous_accumulated_profit) || 0)
+      : (formData.is_previous_subscriber ? (parseFloat(formData.previous_accumulated_profit) || 0) : 0);
     
     const investorData = {
       full_name: formData.full_name,
@@ -210,7 +215,10 @@ const AdminInvestors = () => {
       withdraw_button_text: formData.withdraw_button_text || null,
       withdraw_action_button_enabled: formData.withdraw_action_button_enabled,
       withdraw_action_button_text: formData.withdraw_action_button_text || null,
-      withdraw_action_button_url: formData.withdraw_action_button_url || null
+      withdraw_action_button_url: formData.withdraw_action_button_url || null,
+      notification_bar_enabled: formData.notification_bar_enabled,
+      notification_bar_text: formData.notification_bar_text || null,
+      auto_enable_withdraw_after_24h: formData.auto_enable_withdraw_after_24h
     };
 
     if (editingInvestor) {
@@ -308,7 +316,10 @@ const AdminInvestors = () => {
       withdraw_button_text: investor.withdraw_button_text || "",
       withdraw_action_button_enabled: (investor as any).withdraw_action_button_enabled || false,
       withdraw_action_button_text: (investor as any).withdraw_action_button_text || "",
-      withdraw_action_button_url: (investor as any).withdraw_action_button_url || ""
+      withdraw_action_button_url: (investor as any).withdraw_action_button_url || "",
+      notification_bar_enabled: (investor as any).notification_bar_enabled || false,
+      notification_bar_text: (investor as any).notification_bar_text || "",
+      auto_enable_withdraw_after_24h: (investor as any).auto_enable_withdraw_after_24h || false
     });
     
     setLinkedCustomerId(investor.linked_customer_id || "");
@@ -377,7 +388,10 @@ const AdminInvestors = () => {
       withdraw_button_text: "",
       withdraw_action_button_enabled: false,
       withdraw_action_button_text: "",
-      withdraw_action_button_url: ""
+      withdraw_action_button_url: "",
+      notification_bar_enabled: false,
+      notification_bar_text: "",
+      auto_enable_withdraw_after_24h: false
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
@@ -745,6 +759,36 @@ const AdminInvestors = () => {
                 )}
               </div>
 
+              <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/20">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.notification_bar_enabled}
+                    onCheckedChange={(checked) => setFormData({ ...formData, notification_bar_enabled: checked })}
+                  />
+                  <Label className="cursor-pointer">تفعيل شريط إشعار متحرك في لوحة المستثمر</Label>
+                </div>
+                {formData.notification_bar_enabled && (
+                  <div>
+                    <Label>نص الإشعار (يظهر بشكل متحرك)</Label>
+                    <Input
+                      placeholder="مثال: اكتمل دفع الرسم"
+                      value={formData.notification_bar_text}
+                      onChange={(e) => setFormData({ ...formData, notification_bar_text: e.target.value })}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="border border-border rounded-lg p-4 bg-secondary/20">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.auto_enable_withdraw_after_24h}
+                    onCheckedChange={(checked) => setFormData({ ...formData, auto_enable_withdraw_after_24h: checked })}
+                  />
+                  <Label className="cursor-pointer">تفعيل زر سحب الأرباح تلقائياً بعد 24 ساعة (يظهر بنص: اجراء غير مكتمل - رسوم غير مدفوعه)</Label>
+                </div>
+              </div>
+
               <Button type="submit" variant="gold" className="w-full">
                 {editingInvestor ? "تحديث" : "إضافة"}
               </Button>
@@ -752,6 +796,7 @@ const AdminInvestors = () => {
           </DialogContent>
         </Dialog>
       </div>
+
 
       {/* Investors List */}
       <div className="grid gap-4">

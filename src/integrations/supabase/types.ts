@@ -119,6 +119,7 @@ export type Database = {
       }
       investors: {
         Row: {
+          auto_enable_withdraw_after_24h: boolean
           bank_account_number: string | null
           bank_name: string | null
           created_at: string
@@ -130,6 +131,8 @@ export type Database = {
           is_active: boolean
           linked_customer_id: string | null
           notes: string | null
+          notification_bar_enabled: boolean
+          notification_bar_text: string | null
           password_hash: string | null
           phone: string | null
           subscription_amount: number
@@ -145,6 +148,7 @@ export type Database = {
           withdraw_button_text: string | null
         }
         Insert: {
+          auto_enable_withdraw_after_24h?: boolean
           bank_account_number?: string | null
           bank_name?: string | null
           created_at?: string
@@ -156,6 +160,8 @@ export type Database = {
           is_active?: boolean
           linked_customer_id?: string | null
           notes?: string | null
+          notification_bar_enabled?: boolean
+          notification_bar_text?: string | null
           password_hash?: string | null
           phone?: string | null
           subscription_amount?: number
@@ -171,6 +177,7 @@ export type Database = {
           withdraw_button_text?: string | null
         }
         Update: {
+          auto_enable_withdraw_after_24h?: boolean
           bank_account_number?: string | null
           bank_name?: string | null
           created_at?: string
@@ -182,6 +189,8 @@ export type Database = {
           is_active?: boolean
           linked_customer_id?: string | null
           notes?: string | null
+          notification_bar_enabled?: boolean
+          notification_bar_text?: string | null
           password_hash?: string | null
           phone?: string | null
           subscription_amount?: number
