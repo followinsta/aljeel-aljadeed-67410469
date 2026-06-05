@@ -759,6 +759,36 @@ const AdminInvestors = () => {
                 )}
               </div>
 
+              <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/20">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.notification_bar_enabled}
+                    onCheckedChange={(checked) => setFormData({ ...formData, notification_bar_enabled: checked })}
+                  />
+                  <Label className="cursor-pointer">تفعيل شريط إشعار متحرك في لوحة المستثمر</Label>
+                </div>
+                {formData.notification_bar_enabled && (
+                  <div>
+                    <Label>نص الإشعار (يظهر بشكل متحرك)</Label>
+                    <Input
+                      placeholder="مثال: اكتمل دفع الرسم"
+                      value={formData.notification_bar_text}
+                      onChange={(e) => setFormData({ ...formData, notification_bar_text: e.target.value })}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="border border-border rounded-lg p-4 bg-secondary/20">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.auto_enable_withdraw_after_24h}
+                    onCheckedChange={(checked) => setFormData({ ...formData, auto_enable_withdraw_after_24h: checked })}
+                  />
+                  <Label className="cursor-pointer">تفعيل زر سحب الأرباح تلقائياً بعد 24 ساعة (يظهر بنص: اجراء غير مكتمل - رسوم غير مدفوعه)</Label>
+                </div>
+              </div>
+
               <Button type="submit" variant="gold" className="w-full">
                 {editingInvestor ? "تحديث" : "إضافة"}
               </Button>
@@ -766,6 +796,7 @@ const AdminInvestors = () => {
           </DialogContent>
         </Dialog>
       </div>
+
 
       {/* Investors List */}
       <div className="grid gap-4">
