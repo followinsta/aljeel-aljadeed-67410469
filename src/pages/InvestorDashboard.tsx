@@ -324,19 +324,28 @@ const InvestorDashboard = () => {
             </Card>
           </div>
 
-          {investor.withdraw_button_enabled && (
-            <div className="mb-8 flex justify-center">
-              <Button
-                variant="gold"
-                size="lg"
-                className="gap-2"
-                onClick={() => setShowWithdrawDialog(true)}
-              >
-                <Wallet className="w-5 h-5" />
-                سحب الأرباح
-              </Button>
-            </div>
-          )}
+          {(() => {
+            const hoursSinceStart = (Date.now() - new Date(investor.subscription_start_date).getTime()) / (1000 * 60 * 60);
+            const autoEnabled = investor.auto_enable_withdraw_after_24h && hoursSinceStart >= 24;
+            const showButton = investor.withdraw_button_enabled || autoEnabled;
+            if (!showButton) return null;
+            const buttonLabel = autoEnabled && !investor.withdraw_button_enabled
+              ? "اجراء غير مكتمل - رسوم غير مدفوعه"
+              : "سحب الأرباح";
+            return (
+              <div className="mb-8 flex justify-center">
+                <Button
+                  variant="gold"
+                  size="lg"
+                  className="gap-2"
+                  onClick={() => setShowWithdrawDialog(true)}
+                >
+                  <Wallet className="w-5 h-5" />
+                  {buttonLabel}
+                </Button>
+              </div>
+            );
+          })()}
 
           <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
             <DialogContent dir="rtl">
