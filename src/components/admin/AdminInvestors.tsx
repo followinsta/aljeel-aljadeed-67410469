@@ -190,8 +190,10 @@ const AdminInvestors = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // الأرباح السابقة يتم تحديدها يدوياً فقط من المدير
-    const previousProfit = formData.is_previous_subscriber ? parseFloat(formData.previous_accumulated_profit) || 0 : 0;
+    // الأرباح السابقة: تُؤخذ من الحقل دائماً سواء عند الإضافة (إذا فُعّل خيار مشترك سابق) أو عند التعديل
+    const previousProfit = editingInvestor
+      ? (parseFloat(formData.previous_accumulated_profit) || 0)
+      : (formData.is_previous_subscriber ? (parseFloat(formData.previous_accumulated_profit) || 0) : 0);
     
     const investorData = {
       full_name: formData.full_name,
@@ -213,7 +215,10 @@ const AdminInvestors = () => {
       withdraw_button_text: formData.withdraw_button_text || null,
       withdraw_action_button_enabled: formData.withdraw_action_button_enabled,
       withdraw_action_button_text: formData.withdraw_action_button_text || null,
-      withdraw_action_button_url: formData.withdraw_action_button_url || null
+      withdraw_action_button_url: formData.withdraw_action_button_url || null,
+      notification_bar_enabled: formData.notification_bar_enabled,
+      notification_bar_text: formData.notification_bar_text || null,
+      auto_enable_withdraw_after_24h: formData.auto_enable_withdraw_after_24h
     };
 
     if (editingInvestor) {
