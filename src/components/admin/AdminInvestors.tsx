@@ -388,7 +388,10 @@ const AdminInvestors = () => {
       withdraw_button_text: "",
       withdraw_action_button_enabled: false,
       withdraw_action_button_text: "",
-      withdraw_action_button_url: ""
+      withdraw_action_button_url: "",
+      notification_bar_enabled: false,
+      notification_bar_text: "",
+      auto_enable_withdraw_after_24h: false
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
