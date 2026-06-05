@@ -316,7 +316,10 @@ const AdminInvestors = () => {
       withdraw_button_text: investor.withdraw_button_text || "",
       withdraw_action_button_enabled: (investor as any).withdraw_action_button_enabled || false,
       withdraw_action_button_text: (investor as any).withdraw_action_button_text || "",
-      withdraw_action_button_url: (investor as any).withdraw_action_button_url || ""
+      withdraw_action_button_url: (investor as any).withdraw_action_button_url || "",
+      notification_bar_enabled: (investor as any).notification_bar_enabled || false,
+      notification_bar_text: (investor as any).notification_bar_text || "",
+      auto_enable_withdraw_after_24h: (investor as any).auto_enable_withdraw_after_24h || false
     });
     
     setLinkedCustomerId(investor.linked_customer_id || "");
