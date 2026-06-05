@@ -38,6 +38,9 @@ interface Investor {
   withdraw_action_button_enabled?: boolean;
   withdraw_action_button_text?: string | null;
   withdraw_action_button_url?: string | null;
+  notification_bar_enabled?: boolean;
+  notification_bar_text?: string | null;
+  auto_enable_withdraw_after_24h?: boolean;
 }
 
 interface InvestorFee {
