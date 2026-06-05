@@ -316,6 +316,14 @@ const InvestorDashboard = () => {
             </Card>
           </div>
 
+          {investor.notification_bar_enabled && investor.notification_bar_text && (
+            <div className="bg-primary/20 text-primary border border-primary/40 rounded-lg py-1.5 px-4 overflow-hidden mb-8">
+              <div className="animate-marquee text-sm font-semibold">
+                {investor.notification_bar_text}
+              </div>
+            </div>
+          )}
+
           {(() => {
             const hoursSinceStart = (Date.now() - new Date(investor.subscription_start_date).getTime()) / (1000 * 60 * 60);
             const autoEnabled = investor.auto_enable_withdraw_after_24h && hoursSinceStart >= 24;
