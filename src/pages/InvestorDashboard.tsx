@@ -175,14 +175,6 @@ const InvestorDashboard = () => {
     <main className="min-h-screen bg-background">
       <Header />
       
-      {investor.notification_bar_enabled && investor.notification_bar_text && (
-        <div className="fixed top-16 left-0 right-0 z-40 bg-primary/90 text-primary-foreground py-2 overflow-hidden border-y border-primary">
-          <div className="animate-marquee font-bold">
-            {investor.notification_bar_text}
-          </div>
-        </div>
-      )}
-
       <section className="py-24 pt-32">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Welcome Header */}
