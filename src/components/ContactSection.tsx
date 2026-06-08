@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Phone, MapPin, MessageCircle, Send } from "lucide-react";
 
-const TELEGRAM_LINK = "https://t.me/+2uEtg05UmVc0Yjk0";
+const TELEGRAM_LINK = "https://t.me/NEWJEEL";
 const WHATSAPP_NUMBER = "966545189624";
 
 const ContactSection = () => {
