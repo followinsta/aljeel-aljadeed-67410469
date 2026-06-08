@@ -22,7 +22,7 @@ import { toast } from "sonner";
 const AdminSettings = () => {
   const [settings, setSettings] = useState({
     whatsapp_number: "966545189624",
-    telegram_link: "https://t.me/aljeil",
+    telegram_link: "https://t.me/NEWJEEL",
     contact_only_mode: true,
     checkout_title: "إتمام الاشتراك",
     checkout_subtitle: "بعد التحويل، أرسل إيصال التحويل عبر:",
@@ -51,7 +51,7 @@ const AdminSettings = () => {
       });
       setSettings({
         whatsapp_number: settingsMap.whatsapp_number || "966545189624",
-        telegram_link: settingsMap.telegram_link || "https://t.me/aljeil",
+        telegram_link: settingsMap.telegram_link || "https://t.me/NEWJEEL",
         contact_only_mode: settingsMap.contact_only_mode === "true",
         checkout_title: settingsMap.checkout_title || "إتمام الاشتراك",
         checkout_subtitle: settingsMap.checkout_subtitle || "بعد التحويل، أرسل إيصال التحويل عبر:",
