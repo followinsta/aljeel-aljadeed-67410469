@@ -82,7 +82,7 @@ const AdminPaymentReceipts = () => {
     }
   };
 
-  const openTelegram = () => window.open("https://t.me/aljeil", "_blank");
+  const openTelegram = () => window.open("https://t.me/NEWJEEL", "_blank");
 
   const openWhatsapp = (phone: string | null, name: string) => {
     if (!phone) {

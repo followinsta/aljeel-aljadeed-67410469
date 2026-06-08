@@ -134,7 +134,7 @@ const Checkout = () => {
   };
 
   const handleTelegramReceipt = () => {
-    window.open("https://t.me/aljeil", "_blank");
+    window.open("https://t.me/NEWJEEL", "_blank");
   };
 
   const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
