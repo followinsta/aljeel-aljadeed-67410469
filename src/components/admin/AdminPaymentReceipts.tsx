@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { currencyShort } from "@/lib/currencies";
 import { Send, ExternalLink, CheckCircle2, XCircle, Trash2, Clock, MessageCircle } from "lucide-react";
 
 interface PaymentReceipt {
@@ -12,6 +13,7 @@ interface PaymentReceipt {
   full_name: string;
   email: string | null;
   phone: string | null;
+  package_id: string | null;
   package_name: string | null;
   package_amount: number | null;
   currency: string | null;
@@ -59,7 +61,71 @@ const AdminPaymentReceipts = () => {
     setLoading(false);
   };
 
+  const registerSubscription = async (r: PaymentReceipt) => {
+    // Build subscription data from the chosen package
+    let dailyProfit = 0;
+    let days = 120;
+    let months = 4;
+
+    if (r.package_id) {
+      const { data: pkg } = await supabase
+        .from("packages")
+        .select("daily_profit, investment_period_days")
+        .eq("id", r.package_id)
+        .maybeSingle();
+      if (pkg) {
+        dailyProfit = Number(pkg.daily_profit) || 0;
+        days = Number(pkg.investment_period_days) || 120;
+        months = Math.max(1, Math.round(days / 30));
+      }
+    }
+
+    const investorData: Record<string, unknown> = {
+      full_name: r.full_name,
+      email: r.email,
+      phone: r.phone,
+      subscription_amount: Number(r.package_amount) || 0,
+      daily_profit: dailyProfit,
+      subscription_duration_days: days,
+      subscription_duration_months: months,
+      subscription_start_date: new Date().toISOString().split("T")[0],
+      currency: r.currency || "SAR",
+      linked_customer_id: r.customer_id,
+      is_active: true,
+    };
+
+    // Link to an existing investor record when possible
+    let existingId: string | null = null;
+    if (r.email) {
+      const { data } = await supabase
+        .from("investors")
+        .select("id")
+        .eq("email", r.email)
+        .maybeSingle();
+      existingId = data?.id ?? null;
+    }
+
+    if (existingId) {
+      const { error } = await supabase.from("investors").update(investorData).eq("id", existingId);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from("investors").insert(investorData as never);
+      if (error) throw error;
+    }
+  };
+
   const updateStatus = async (id: string, status: string) => {
+    const receipt = receipts.find((r) => r.id === id);
+
+    if (status === "approved" && receipt) {
+      try {
+        await registerSubscription(receipt);
+      } catch {
+        toast.error("تم تعذر تسجيل الاشتراك للعميل");
+        return;
+      }
+    }
+
     const { error } = await supabase
       .from("payment_receipts")
       .update({ status })
@@ -67,7 +133,7 @@ const AdminPaymentReceipts = () => {
     if (error) {
       toast.error("خطأ في تحديث الحالة");
     } else {
-      toast.success("تم التحديث");
+      toast.success(status === "approved" ? "تمت الموافقة وتسجيل الاشتراك للعميل" : "تم التحديث");
       setReceipts((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
     }
   };
@@ -169,7 +235,7 @@ const AdminPaymentReceipts = () => {
                       <div>
                         <span className="text-muted-foreground text-xs">المبلغ:</span>
                         <p className="font-bold text-primary">
-                          {r.package_amount?.toLocaleString("ar-SA")} {r.currency === "USD" ? "دولار" : "ريال"}
+                          {r.package_amount?.toLocaleString("ar-SA")} {currencyShort(r.currency)}
                         </p>
                       </div>
                       <div className="col-span-2">

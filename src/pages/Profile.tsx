@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { User, Mail, Phone, Hash, Lock, Save, Loader2 } from "lucide-react";
+import { User, Mail, Phone, Hash, Lock, Save, Loader2, TrendingUp, Banknote, Calendar } from "lucide-react";
+import { currencyShort } from "@/lib/currencies";
 
 interface UserProfile {
   id: string;
@@ -20,11 +21,23 @@ interface UserProfile {
   phone: string | null;
 }
 
+interface InvestmentSummary {
+  full_name: string;
+  subscription_amount: number;
+  daily_profit: number;
+  subscription_duration_days: number;
+  subscription_start_date: string;
+  total_accumulated_profit: number;
+  currency: string | null;
+  is_active: boolean;
+}
+
 const Profile = () => {
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [investment, setInvestment] = useState<InvestmentSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
@@ -46,6 +59,7 @@ const Profile = () => {
     }
     if (user) {
       fetchProfile();
+      fetchInvestment();
     }
   }, [user, authLoading, navigate]);
 
@@ -66,6 +80,16 @@ const Profile = () => {
       });
     }
     setLoading(false);
+  };
+
+  const fetchInvestment = async () => {
+    if (!user?.email) return;
+    const { data } = await supabase
+      .from("investors")
+      .select("full_name, subscription_amount, daily_profit, subscription_duration_days, subscription_start_date, total_accumulated_profit, currency, is_active")
+      .eq("email", user.email)
+      .maybeSingle();
+    if (data) setInvestment(data as InvestmentSummary);
   };
 
   const handleSaveProfile = async () => {
@@ -164,6 +188,51 @@ const Profile = () => {
                 <p className="text-sm text-muted-foreground mt-2">
                   استخدم هذا الرقم عند التواصل معنا لتفعيل حسابك
                 </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Investment Summary */}
+          {investment && (
+            <Card className="bg-card border-primary/30 mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  اشتراكي الاستثماري
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {(() => {
+                  const curr = currencyShort(investment.currency);
+                  const start = new Date(investment.subscription_start_date);
+                  const daysPassed = Math.max(0, Math.floor((Date.now() - start.getTime()) / 86400000));
+                  const daysRemaining = Math.max(0, investment.subscription_duration_days - daysPassed);
+                  const profit = investment.total_accumulated_profit + investment.daily_profit * daysPassed;
+                  const fmt = (n: number) => n.toLocaleString("ar-SA");
+                  return (
+                    <>
+                      <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                        <span className="text-muted-foreground flex items-center gap-2"><Banknote className="w-4 h-4" />مبلغ الاستثمار</span>
+                        <span className="font-bold text-primary">{fmt(investment.subscription_amount)} {curr}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                        <span className="text-muted-foreground flex items-center gap-2"><TrendingUp className="w-4 h-4" />الربح اليومي</span>
+                        <span className="font-bold">{fmt(investment.daily_profit)} {curr}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                        <span className="text-muted-foreground flex items-center gap-2"><TrendingUp className="w-4 h-4" />الأرباح المتراكمة</span>
+                        <span className="font-bold text-accent">{fmt(profit)} {curr}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                        <span className="text-muted-foreground flex items-center gap-2"><Calendar className="w-4 h-4" />الأيام المتبقية</span>
+                        <span className="font-bold text-green-500">{daysRemaining} يوم</span>
+                      </div>
+                      <Button variant="gold" className="w-full" onClick={() => navigate("/investor-dashboard")}>
+                        عرض لوحة متابعة الاستثمار
+                      </Button>
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
           )}

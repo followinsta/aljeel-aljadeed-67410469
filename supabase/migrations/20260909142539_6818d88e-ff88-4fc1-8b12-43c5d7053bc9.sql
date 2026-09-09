@@ -1,0 +1,3 @@
+ALTER TABLE public.investors
+  ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT 'SAR',
+  ADD COLUMN IF NOT EXISTS fees_section_visible BOOLEAN NOT NULL DEFAULT true;

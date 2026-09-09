@@ -24,6 +24,8 @@ import {
   Hash
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CURRENCIES, currencyShort } from "@/lib/currencies";
 
 interface Investor {
   id: string;
@@ -47,6 +49,8 @@ interface Investor {
   withdraw_action_button_enabled?: boolean;
   withdraw_action_button_text?: string | null;
   withdraw_action_button_url?: string | null;
+  currency?: string | null;
+  fees_section_visible?: boolean;
 }
 
 interface CustomerProfile {
@@ -118,7 +122,9 @@ const AdminInvestors = () => {
     withdraw_action_button_url: "",
     notification_bar_enabled: false,
     notification_bar_text: "",
-    auto_enable_withdraw_after_24h: false
+    auto_enable_withdraw_after_24h: false,
+    currency: "SAR",
+    fees_section_visible: true
   });
 
   useEffect(() => {
@@ -218,7 +224,9 @@ const AdminInvestors = () => {
       withdraw_action_button_url: formData.withdraw_action_button_url || null,
       notification_bar_enabled: formData.notification_bar_enabled,
       notification_bar_text: formData.notification_bar_text || null,
-      auto_enable_withdraw_after_24h: formData.auto_enable_withdraw_after_24h
+      auto_enable_withdraw_after_24h: formData.auto_enable_withdraw_after_24h,
+      currency: formData.currency,
+      fees_section_visible: formData.fees_section_visible
     };
 
     if (editingInvestor) {
@@ -319,7 +327,9 @@ const AdminInvestors = () => {
       withdraw_action_button_url: (investor as any).withdraw_action_button_url || "",
       notification_bar_enabled: (investor as any).notification_bar_enabled || false,
       notification_bar_text: (investor as any).notification_bar_text || "",
-      auto_enable_withdraw_after_24h: (investor as any).auto_enable_withdraw_after_24h || false
+      auto_enable_withdraw_after_24h: (investor as any).auto_enable_withdraw_after_24h || false,
+      currency: (investor as any).currency || "SAR",
+      fees_section_visible: (investor as any).fees_section_visible !== false
     });
     
     setLinkedCustomerId(investor.linked_customer_id || "");
@@ -391,7 +401,9 @@ const AdminInvestors = () => {
       withdraw_action_button_url: "",
       notification_bar_enabled: false,
       notification_bar_text: "",
-      auto_enable_withdraw_after_24h: false
+      auto_enable_withdraw_after_24h: false,
+      currency: "SAR",
+      fees_section_visible: true
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
@@ -553,6 +565,22 @@ const AdminInvestors = () => {
                   />
                 </div>
                 <div>
+                  <Label>عملة الاستثمار *</Label>
+                  <Select
+                    value={formData.currency}
+                    onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر العملة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <Label>مبلغ الاشتراك *</Label>
                   <Input
                     type="number"
@@ -625,6 +653,16 @@ const AdminInvestors = () => {
                   />
                 </div>
               )}
+
+              <div className="border border-border rounded-lg p-4 bg-secondary/20">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.fees_section_visible}
+                    onCheckedChange={(checked) => setFormData({ ...formData, fees_section_visible: checked })}
+                  />
+                  <Label className="cursor-pointer">إظهار قسم "حالة الرسوم" في لوحة المستثمر</Label>
+                </div>
+              </div>
 
               {/* Fee Types Selection */}
               <div>
@@ -819,11 +857,11 @@ const AdminInvestors = () => {
                       )}
                       <span className="flex items-center gap-1">
                         <CreditCard className="w-3 h-3" />
-                        {formatNumber(investor.subscription_amount)} ريال
+                        {formatNumber(investor.subscription_amount)} {currencyShort(investor.currency)}
                       </span>
                       <span className="flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
-                        {formatNumber(investor.daily_profit)} ريال/يوم
+                        {formatNumber(investor.daily_profit)} {currencyShort(investor.currency)}/يوم
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -836,7 +874,7 @@ const AdminInvestors = () => {
                 <div className="flex items-center gap-2">
                   <div className="text-left ml-4">
                     <p className="text-muted-foreground text-xs">الأرباح المتراكمة</p>
-                    <p className="text-accent font-bold">{formatNumber(investor.total_accumulated_profit)} ريال</p>
+                    <p className="text-accent font-bold">{formatNumber(investor.total_accumulated_profit)} {currencyShort(investor.currency)}</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => handleView(investor)}>
                     <Eye className="w-4 h-4" />
@@ -879,15 +917,15 @@ const AdminInvestors = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">مبلغ الاشتراك</p>
-                  <p className="font-medium">{formatNumber(viewingInvestor.subscription_amount)} ريال</p>
+                  <p className="font-medium">{formatNumber(viewingInvestor.subscription_amount)} {currencyShort(viewingInvestor.currency)}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">الربح اليومي</p>
-                  <p className="font-medium text-accent">{formatNumber(viewingInvestor.daily_profit)} ريال</p>
+                  <p className="font-medium text-accent">{formatNumber(viewingInvestor.daily_profit)} {currencyShort(viewingInvestor.currency)}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">الأرباح المتراكمة</p>
-                  <p className="font-medium text-primary">{formatNumber(viewingInvestor.total_accumulated_profit)} ريال</p>
+                  <p className="font-medium text-primary">{formatNumber(viewingInvestor.total_accumulated_profit)} {currencyShort(viewingInvestor.currency)}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">تاريخ البداية</p>

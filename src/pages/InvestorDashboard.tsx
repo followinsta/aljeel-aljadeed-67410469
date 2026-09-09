@@ -41,6 +41,8 @@ interface Investor {
   notification_bar_enabled?: boolean;
   notification_bar_text?: string | null;
   auto_enable_withdraw_after_24h?: boolean;
+  currency?: string | null;
+  fees_section_visible?: boolean;
 }
 
 interface InvestorFee {
@@ -163,6 +165,7 @@ const InvestorDashboard = () => {
     );
   }
 
+  const cur = currencyShort(investor.currency);
   const daysPassed = calculateDaysPassed();
   const daysRemaining = calculateDaysRemaining();
   const totalExpectedProfit = investor.daily_profit * investor.subscription_duration_days;
@@ -196,7 +199,7 @@ const InvestorDashboard = () => {
                   <span className="text-muted-foreground text-sm">مبلغ الاستثمار</span>
                 </div>
                 <p className="text-2xl font-bold text-gradient-gold">
-                  {formatNumber(investor.subscription_amount)} ريال
+                  {formatNumber(investor.subscription_amount)} {cur}
                 </p>
               </CardContent>
             </Card>
@@ -210,7 +213,7 @@ const InvestorDashboard = () => {
                   <span className="text-muted-foreground text-sm">الأرباح المتراكمة</span>
                 </div>
                 <p className="text-2xl font-bold text-accent">
-                  {formatNumber(currentProfit)} ريال
+                  {formatNumber(currentProfit)} {cur}
                 </p>
               </CardContent>
             </Card>
@@ -238,7 +241,7 @@ const InvestorDashboard = () => {
                   <span className="text-muted-foreground text-sm">الربح اليومي</span>
                 </div>
                 <p className="text-2xl font-bold text-blue-500">
-                  {formatNumber(investor.daily_profit)} ريال
+                  {formatNumber(investor.daily_profit)} {cur}
                 </p>
               </CardContent>
             </Card>
@@ -269,21 +272,21 @@ const InvestorDashboard = () => {
                 {investor.total_accumulated_profit > 0 && (
                   <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
                     <span className="text-muted-foreground">الأرباح السابقة</span>
-                    <span className="font-medium text-accent">{formatNumber(investor.total_accumulated_profit)} ريال</span>
+                    <span className="font-medium text-accent">{formatNumber(investor.total_accumulated_profit)} {cur}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
                   <span className="text-muted-foreground">أرباح الفترة الحالية</span>
-                  <span className="font-medium text-accent">{formatNumber(calculatedProfit)} ريال</span>
+                  <span className="font-medium text-accent">{formatNumber(calculatedProfit)} {cur}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-gradient-gold/10 rounded-lg border border-primary/30">
                   <span className="text-foreground font-medium">إجمالي الربح المتوقع</span>
-                  <span className="font-bold text-primary">{formatNumber(totalExpectedProfit + investor.total_accumulated_profit)} ريال</span>
+                  <span className="font-bold text-primary">{formatNumber(totalExpectedProfit + investor.total_accumulated_profit)} {cur}</span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Fees Status */}
+            {investor.fees_section_visible !== false && (
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -314,6 +317,7 @@ const InvestorDashboard = () => {
                 )}
               </CardContent>
             </Card>
+            )}
           </div>
 
           {investor.notification_bar_enabled && investor.notification_bar_text && (
@@ -385,9 +389,9 @@ const InvestorDashboard = () => {
                     <div key={record.id} className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
                       <span className="text-muted-foreground">{formatDate(record.profit_date)}</span>
                       <div className="flex items-center gap-4">
-                        <span className="text-accent font-medium">+{formatNumber(record.profit_amount)} ريال</span>
+                        <span className="text-accent font-medium">+{formatNumber(record.profit_amount)} {cur}</span>
                         <span className="text-muted-foreground text-sm">
-                          الإجمالي: {formatNumber(record.cumulative_profit)} ريال
+                          الإجمالي: {formatNumber(record.cumulative_profit)} {cur}
                         </span>
                       </div>
                     </div>
