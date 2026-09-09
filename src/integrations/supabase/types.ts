@@ -123,8 +123,10 @@ export type Database = {
           bank_account_number: string | null
           bank_name: string | null
           created_at: string
+          currency: string
           daily_profit: number
           email: string | null
+          fees_section_visible: boolean
           full_name: string
           iban: string | null
           id: string
@@ -152,8 +154,10 @@ export type Database = {
           bank_account_number?: string | null
           bank_name?: string | null
           created_at?: string
+          currency?: string
           daily_profit?: number
           email?: string | null
+          fees_section_visible?: boolean
           full_name: string
           iban?: string | null
           id?: string
@@ -181,8 +185,10 @@ export type Database = {
           bank_account_number?: string | null
           bank_name?: string | null
           created_at?: string
+          currency?: string
           daily_profit?: number
           email?: string | null
+          fees_section_visible?: boolean
           full_name?: string
           iban?: string | null
           id?: string
