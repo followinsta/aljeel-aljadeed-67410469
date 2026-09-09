@@ -224,7 +224,9 @@ const AdminInvestors = () => {
       withdraw_action_button_url: formData.withdraw_action_button_url || null,
       notification_bar_enabled: formData.notification_bar_enabled,
       notification_bar_text: formData.notification_bar_text || null,
-      auto_enable_withdraw_after_24h: formData.auto_enable_withdraw_after_24h
+      auto_enable_withdraw_after_24h: formData.auto_enable_withdraw_after_24h,
+      currency: formData.currency,
+      fees_section_visible: formData.fees_section_visible
     };
 
     if (editingInvestor) {
@@ -325,7 +327,9 @@ const AdminInvestors = () => {
       withdraw_action_button_url: (investor as any).withdraw_action_button_url || "",
       notification_bar_enabled: (investor as any).notification_bar_enabled || false,
       notification_bar_text: (investor as any).notification_bar_text || "",
-      auto_enable_withdraw_after_24h: (investor as any).auto_enable_withdraw_after_24h || false
+      auto_enable_withdraw_after_24h: (investor as any).auto_enable_withdraw_after_24h || false,
+      currency: (investor as any).currency || "SAR",
+      fees_section_visible: (investor as any).fees_section_visible !== false
     });
     
     setLinkedCustomerId(investor.linked_customer_id || "");
@@ -397,7 +401,9 @@ const AdminInvestors = () => {
       withdraw_action_button_url: "",
       notification_bar_enabled: false,
       notification_bar_text: "",
-      auto_enable_withdraw_after_24h: false
+      auto_enable_withdraw_after_24h: false,
+      currency: "SAR",
+      fees_section_visible: true
     });
     setEditingInvestor(null);
     setSelectedFeeTypes([]);
