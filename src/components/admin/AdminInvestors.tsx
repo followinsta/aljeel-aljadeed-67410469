@@ -24,6 +24,8 @@ import {
   Hash
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CURRENCIES, currencyShort } from "@/lib/currencies";
 
 interface Investor {
   id: string;
@@ -47,6 +49,8 @@ interface Investor {
   withdraw_action_button_enabled?: boolean;
   withdraw_action_button_text?: string | null;
   withdraw_action_button_url?: string | null;
+  currency?: string | null;
+  fees_section_visible?: boolean;
 }
 
 interface CustomerProfile {
@@ -118,7 +122,9 @@ const AdminInvestors = () => {
     withdraw_action_button_url: "",
     notification_bar_enabled: false,
     notification_bar_text: "",
-    auto_enable_withdraw_after_24h: false
+    auto_enable_withdraw_after_24h: false,
+    currency: "SAR",
+    fees_section_visible: true
   });
 
   useEffect(() => {
