@@ -565,6 +565,22 @@ const AdminInvestors = () => {
                   />
                 </div>
                 <div>
+                  <Label>عملة الاستثمار *</Label>
+                  <Select
+                    value={formData.currency}
+                    onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر العملة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <Label>مبلغ الاشتراك *</Label>
                   <Input
                     type="number"
@@ -637,6 +653,16 @@ const AdminInvestors = () => {
                   />
                 </div>
               )}
+
+              <div className="border border-border rounded-lg p-4 bg-secondary/20">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.fees_section_visible}
+                    onCheckedChange={(checked) => setFormData({ ...formData, fees_section_visible: checked })}
+                  />
+                  <Label className="cursor-pointer">إظهار قسم "حالة الرسوم" في لوحة المستثمر</Label>
+                </div>
+              </div>
 
               {/* Fee Types Selection */}
               <div>
