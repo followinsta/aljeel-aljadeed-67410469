@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { currencyShort } from "@/lib/currencies";
 import { Send, ExternalLink, CheckCircle2, XCircle, Trash2, Clock, MessageCircle } from "lucide-react";
 
 interface PaymentReceipt {
@@ -234,7 +235,7 @@ const AdminPaymentReceipts = () => {
                       <div>
                         <span className="text-muted-foreground text-xs">المبلغ:</span>
                         <p className="font-bold text-primary">
-                          {r.package_amount?.toLocaleString("ar-SA")} {r.currency === "USD" ? "دولار" : "ريال"}
+                          {r.package_amount?.toLocaleString("ar-SA")} {currencyShort(r.currency)}
                         </p>
                       </div>
                       <div className="col-span-2">
