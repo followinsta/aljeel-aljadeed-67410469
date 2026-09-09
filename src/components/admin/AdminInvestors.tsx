@@ -857,11 +857,11 @@ const AdminInvestors = () => {
                       )}
                       <span className="flex items-center gap-1">
                         <CreditCard className="w-3 h-3" />
-                        {formatNumber(investor.subscription_amount)} ريال
+                        {formatNumber(investor.subscription_amount)} {currencyShort(investor.currency)}
                       </span>
                       <span className="flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
-                        {formatNumber(investor.daily_profit)} ريال/يوم
+                        {formatNumber(investor.daily_profit)} {currencyShort(investor.currency)}/يوم
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -874,7 +874,7 @@ const AdminInvestors = () => {
                 <div className="flex items-center gap-2">
                   <div className="text-left ml-4">
                     <p className="text-muted-foreground text-xs">الأرباح المتراكمة</p>
-                    <p className="text-accent font-bold">{formatNumber(investor.total_accumulated_profit)} ريال</p>
+                    <p className="text-accent font-bold">{formatNumber(investor.total_accumulated_profit)} {currencyShort(investor.currency)}</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => handleView(investor)}>
                     <Eye className="w-4 h-4" />
@@ -917,15 +917,15 @@ const AdminInvestors = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">مبلغ الاشتراك</p>
-                  <p className="font-medium">{formatNumber(viewingInvestor.subscription_amount)} ريال</p>
+                  <p className="font-medium">{formatNumber(viewingInvestor.subscription_amount)} {currencyShort(viewingInvestor.currency)}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">الربح اليومي</p>
-                  <p className="font-medium text-accent">{formatNumber(viewingInvestor.daily_profit)} ريال</p>
+                  <p className="font-medium text-accent">{formatNumber(viewingInvestor.daily_profit)} {currencyShort(viewingInvestor.currency)}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">الأرباح المتراكمة</p>
-                  <p className="font-medium text-primary">{formatNumber(viewingInvestor.total_accumulated_profit)} ريال</p>
+                  <p className="font-medium text-primary">{formatNumber(viewingInvestor.total_accumulated_profit)} {currencyShort(viewingInvestor.currency)}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">تاريخ البداية</p>
