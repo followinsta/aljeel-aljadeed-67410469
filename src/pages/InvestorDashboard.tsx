@@ -17,6 +17,7 @@ import {
   History,
   Wallet
 } from "lucide-react";
+import { currencyShort } from "@/lib/currencies";
 
 interface Investor {
   id: string;
